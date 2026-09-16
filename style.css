@@ -1,0 +1,348 @@
+:root {
+    --lol-gold-1: #f0e6d2;
+    --lol-gold-2: #c8aa6e;
+    --lol-gold-3: #785a28;
+    --lol-gold-4: #463714;
+    --lol-hextech-blue: #0ac8b9;
+    --lol-hextech-glow: #005a82;
+    --lol-bg-dark: #010a13;
+    --lol-bg-card: rgba(9, 20, 40, 0.85);
+    --lol-border: #c8aa6e;
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Spiegel', sans-serif, system-ui;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--lol-bg-dark);
+    font-family: var(--font-body);
+    color: var(--lol-gold-1);
+}
+
+/* Canvas 3D */
+#webgl-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Moldura ornamental League of Legends */
+.hextech-frame {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--lol-gold-3);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.hextech-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--lol-gold-2), transparent);
+}
+
+/* NAV BAR / HEADER */
+header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    z-index: 20;
+    background: linear-gradient(180deg, rgba(1, 10, 19, 0.95) 0%, rgba(1, 10, 19, 0.4) 100%);
+    border-bottom: 2px solid var(--lol-gold-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--lol-gold-2);
+    transform: rotate(45deg);
+    background: var(--lol-hextech-glow);
+    box-shadow: 0 0 10px var(--lol-hextech-blue);
+}
+
+.brand-title {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--lol-gold-1);
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(200, 170, 110, 0.5);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-hextech {
+    background: linear-gradient(180deg, #1e2328 0%, #0e1215 100%);
+    border: 1px solid var(--lol-gold-2);
+    color: var(--lol-gold-1);
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.btn-hextech:hover {
+    background: linear-gradient(180deg, var(--lol-gold-3) 0%, var(--lol-gold-4) 100%);
+    border-color: var(--lol-gold-1);
+    box-shadow: 0 0 15px rgba(200, 170, 110, 0.4);
+    color: #fff;
+}
+
+.btn-hextech.active {
+    background: linear-gradient(180deg, #005a82 0%, #0a3246 100%);
+    border-color: var(--lol-hextech-blue);
+    color: var(--lol-hextech-blue);
+    box-shadow: 0 0 15px var(--lol-hextech-blue);
+}
+
+/* TELA INICIAL (SPLASH SCREEN / PRESENTATION) */
+#welcome-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background: radial-gradient(circle at center, rgba(10, 30, 50, 0.85) 0%, rgba(1, 10, 19, 0.98) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+}
+
+.welcome-card {
+    max-width: 650px;
+    background: var(--lol-bg-card);
+    border: 2px solid var(--lol-gold-2);
+    padding: 40px 30px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(200, 170, 110, 0.15);
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+}
+
+.welcome-title {
+    font-family: var(--font-title);
+    font-size: 2.2rem;
+    color: var(--lol-gold-1);
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px var(--lol-gold-2);
+}
+
+.welcome-subtitle {
+    font-size: 1rem;
+    color: #a09b8c;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.btn-start {
+    font-size: 1.1rem;
+    padding: 14px 40px;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+/* PAINEL DE NAVEGAÇÃO DOS MODELOS (INFERIOR) */
+.controls-panel {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+    background: rgba(1, 10, 19, 0.85);
+    padding: 10px;
+    border: 1px solid var(--lol-gold-3);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    max-width: 95vw;
+    overflow-x: auto;
+}
+
+/* CARD INFORMATIVO HISTÓRICO (LATERAL) */
+.info-card {
+    position: absolute;
+    top: 90px;
+    right: 25px;
+    width: 360px;
+    max-height: calc(100vh - 180px);
+    background: var(--lol-bg-card);
+    border: 1px solid var(--lol-gold-2);
+    padding: 22px;
+    z-index: 20;
+    overflow-y: auto;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    transition: all 0.3s ease;
+}
+
+.info-card h2 {
+    font-family: var(--font-title);
+    font-size: 1.3rem;
+    color: var(--lol-gold-2);
+    border-bottom: 1px solid var(--lol-gold-3);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-card .year-badge {
+    display: inline-block;
+    background: var(--lol-gold-4);
+    color: var(--lol-gold-1);
+    font-size: 0.75rem;
+    font-family: var(--font-title);
+    padding: 2px 8px;
+    border: 1px solid var(--lol-gold-3);
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.info-card p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #cdbe91;
+    margin-bottom: 12px;
+}
+
+.info-card ul {
+    margin-left: 18px;
+    font-size: 0.88rem;
+    color: #a09b8c;
+    line-height: 1.5;
+}
+
+/* CONTROLES EXTRAS DO SIMULADOR (ESQUERDA) */
+.sim-settings {
+    position: absolute;
+    top: 90px;
+    left: 25px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.1rem;
+}
+
+/* DICAS / TUTORIAL SOBRE O CANVAS */
+.canvas-hint {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    font-size: 0.75rem;
+    color: var(--lol-gold-2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* CUSTOM SCROLLBAR (ESTILO LOL) */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(1, 10, 19, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--lol-gold-3);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--lol-gold-2);
+}
+
+/* ADAPTATIVIDADE MOBILE (ANDROID & PC) */
+@media (max-width: 768px) {
+    header {
+        height: 60px;
+        padding: 0 10px;
+    }
+
+    .brand-title {
+        font-size: 0.95rem;
+    }
+
+    .info-card {
+        top: auto;
+        bottom: 85px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-height: 38vh;
+    }
+
+    .controls-panel {
+        bottom: 12px;
+        width: 95vw;
+        justify-content: flex-start;
+    }
+
+    .sim-settings {
+        top: 70px;
+        left: 10px;
+    }
+
+    .canvas-hint {
+        display: none;
+    }
+}
