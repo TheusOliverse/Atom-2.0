@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom | Thomson &rarr; Rutherford</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        hexDark: '#070a10',
+                        hexPanel: '#0a101d',
+                        hexBorder: '#1e293b',
+                        hexGold: '#c89b3c',
+                        hexGoldLight: '#f0e6d2',
+                        hexGoldDark: '#785a28',
+                        hexBlue: '#0bc6e3',
+                        hexBlueGlow: '#00f2ff',
+                        hexRed: '#f04242',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hex-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        .hex-clip-btn {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .hex-corner-tl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #c89b3c;
+            border-left: 2px solid #c89b3c;
+        }
+
+        .hex-corner-br {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid #c89b3c;
+            border-right: 2px solid #c89b3c;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #070a10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c89b3c;
+            border-radius: 3px;
+        }
+
+        .hex-glow {
+            box-shadow: 0 0 20px rgba(12, 198, 227, 0.15), inset 0 0 15px rgba(200, 155, 60, 0.1);
+        }
+
+        .hex-gold-glow {
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.6);
+        }
+
+        .hex-blue-glow {
+            text-shadow: 0 0 10px rgba(11, 198, 227, 0.6);
+        }
+
+        .hex-grid-bg {
+            background-image: linear-gradient(rgba(200, 155, 60, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 155, 60, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-hexDark text-hexGoldLight font-sans min-h-screen hex-grid-bg flex flex-col relative overflow-x-hidden selection:bg-hexGold selection:text-hexDark">
+
+    <header
+        class="border-b border-hexGold/30 bg-hexPanel/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-12 py-3 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-4">
+            <div
+                class="w-10 h-10 hex-clip bg-gradient-to-br from-hexGold to-hexGoldDark flex items-center justify-center border border-hexGold/60 shadow-lg">
+                <i class="fa-solid fa-atom text-hexDark text-lg animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+                <h1
+                    class="font-cinzel font-black tracking-widest text-lg lg:text-xl text-hexGold hex-gold-glow uppercase">
+                    Atom // Linha Temporal</h1>
+                <p class="text-xs text-hexBlue tracking-wider">Transição Atômica: De Thomson (1897) a Rutherford (1911)
+                </p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-3 bg-hexDark/80 border border-hexGold/30 px-4 py-1.5 hex-clip">
+            <span class="w-2 h-2 rounded-full bg-hexBlue animate-ping"></span>
+            <span class="text-xs tracking-widest uppercase text-hexGoldLight">Status: Laboratório de Partículas Alfa
+                Ativo</span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 flex flex-col gap-8">
+        <nav class="grid grid-cols-2 sm:grid-cols-4 gap-2" aria-label="Abas de Navegação">
+            <button onclick="switchTab('thomson')" id="btn-thomson"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 01</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo
+                    Thomson</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('experiment')" id="btn-experiment"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 02</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">A
+                    Experiência de Ouro</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('rutherford')" id="btn-rutherford"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 03</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo
+                    Rutherford</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('comparison')" id="btn-comparison"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden col-span-2 sm:col-span-1">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 04</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Quadro
+                    Comparativo</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+        </nav>
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+
+                <div id="tab-content-thomson"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-pie-chart text-hexBlue text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de J.J. Thomson
+                                (1897)</h2>
+                            <p class="text-xs text-hexBlue">O Pudim de Passas e a Primeira Quebra da Indivisibilidade
+                            </p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Após descobrir o elétron em seus experimentos com tubos de raios catódicos, o físico
+                            britânico J.J. Thomson percebeu que o átomo não era a partícula indivisível postulada por
+                            Dalton. Como a matéria possui carga elétrica neutra, era necessário que o átomo abrigasse
+                            cargas elétricas opostas.
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexBlue/50">
+                            <li><strong class="text-hexBlue">1. Esfera Positiva Contínua:</strong> O átomo foi concebido
+                                como uma massa esférica gelatinosa carregada positivamente, que preenchia todo o volume
+                                atômico.</li>
+                            <li><strong class="text-hexBlue">2. Elétrons Incrustados:</strong> Pequenos corpúsculos de
+                                carga negativa (os elétrons) encontravam-se espalhados e incrustados no interior dessa
+                                massa positiva.</li>
+                            <li><strong class="text-hexBlue">3. Neutralidade:</strong> A carga total positiva da esfera
+                                equilibrava exatamente a carga negativa combinada dos elétrons.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexBlue/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexBlue uppercase block mb-1">Previsão Teórica para
+                                Partículas Alfa:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                No modelo de Thomson, a carga positiva estava distribuída de maneira difusa por todo o
+                                volume com baixa densidade elétrica. Portanto, se partículas alfa pesadas e velozes
+                                fossem disparadas contra o átomo, a força eletrostática exercida por essa massa difusa
+                                seria fraca, fazendo com que todas as partículas passassem direto ou sofressem apenas
+                                desvios mínimos de poucos graus.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-experiment"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-flask text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Experimento de
+                                Rutherford (1911)</h2>
+                            <p class="text-xs text-hexBlue">O Bombardeamento de Partículas Alfa na Lâmina de Ouro</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Desejando testar a validade do modelo de Thomson, Ernest Rutherford, junto com seus
+                            assistentes Hans Geiger e Ernest Marsden, realizou um experimento monumental na Universidade
+                            de Manchester.
+                        </p>
+                        <div class="p-4 bg-hexDark/90 border border-hexGold/50 hex-clip my-3">
+                            <h3 class="font-cinzel text-hexGold font-bold text-sm mb-2"><i
+                                    class="fa-solid fa-radiation mr-2"></i>A Montagem Experimental</h3>
+                            <p class="text-xs text-hexGoldLight/80 leading-relaxed">
+                                Um bloco de chumbo contendo uma amostra de polônio radioativo emitia um feixe estreito
+                                de <strong>partículas alfa ($\alpha$)</strong> — núcleos de hélio carregados
+                                positivamente e de alta velocidade. Esse feixe era direcionado contra uma lâmina de ouro
+                                extremamente delgada (com espessura de poucos átomos). Ao redor da lâmina, colocou-se
+                                uma tela revestida de sulfeto de zinco, que brilhava (cintilava) ao ser atingida por uma
+                                partícula alfa.
+                            </p>
+                        </div>
+                        <p>
+                            Os resultados obtidos chocaram a comunidade científica:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexGold/50 text-sm">
+                            <li><strong class="text-hexGold">A Maioria Atravessou Ilesa:</strong> Cerca de 99% das
+                                partículas alfa cruzaram a lâmina de ouro sem sofrer qualquer desvio perceptível,
+                                provando que o átomo é essencialmente constituído por <strong>espaço vazio</strong>.
+                            </li>
+                            <li><strong class="text-hexGold">Desvios Acentuados:</strong> Uma pequena fração de
+                                partículas sofreu desvios em ângulos consideráveis.</li>
+                            <li><strong class="text-hexGold">O Grande Choque (Rebatidas):</strong> Aproximadamente 1 em
+                                cada 20.000 partículas alfa bateu e ricocheteou de volta (desvios superiores a 90°).
+                                Rutherford exclamou que era como disparar um projétil de artilharia contra uma folha de
+                                papel e ver ele voltar para atingir o atirador.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-content-rutherford"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-solar-system text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de Ernest
+                                Rutherford (1911)</h2>
+                            <p class="text-xs text-hexBlue">O Átomo Nuclear Planetário</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Para explicar os resultados empíricos do espalhamento alfa, Rutherford descartou o modelo de
+                            Thomson e propôs um novo paradigma estrutural para o átomo:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexGold/50">
+                            <li><strong class="text-hexGold">1. O Núcleo Atômico:</strong> Toda a carga positiva e
+                                praticamente toda a massa do átomo estão concentradas em uma região central minúscula,
+                                densa e maciça chamada de núcleo.</li>
+                            <li><strong class="text-hexGold">2. A Eletrosfera:</strong> O espaço ao redor do núcleo é
+                                imenso e praticamente vazio, onde os elétrons (negativos) giram em órbitas circulares ao
+                                redor do núcleo positivo, tal qual os planetas ao redor do Sol.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexRed/40 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexRed uppercase block mb-1"><i
+                                    class="fa-solid fa-triangle-exclamation mr-1"></i> A Grande Crise Teórica
+                                (Eletrodinâmica Clássica):</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                Embora revolucionário, o modelo de Rutherford enfrentou um impasse insuperável pela
+                                física clássica de Maxwell: elétrons em órbita sofrem aceleração centrípeta e, portanto,
+                                deveriam emitir radiação eletromagnética continuamente, perdendo energia e espiralando
+                                em direção ao núcleo em frações de segundo. O átomo de Rutherford era instável, abrindo
+                                caminho para o modelo quântico de Bohr.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-comparison"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scale-balanced text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">Quadro Comparativo:
+                                Thomson vs. Rutherford</h2>
+                            <p class="text-xs text-hexBlue">O Salto Conceitual da Transição</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs lg:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-hexGold/40 bg-hexDark/60 text-hexGold font-cinzel">
+                                    <th class="p-3">Critério Estrutural</th>
+                                    <th class="p-3 text-hexBlue">Modelo de Thomson (1897)</th>
+                                    <th class="p-3 text-hexGold">Modelo de Rutherford (1911)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-hexBorder text-hexGoldLight/90">
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Distribuição de Carga Positiva</td>
+                                    <td class="p-3">Difusa, preenchendo toda a esfera gelatinosa de forma homogênea.
+                                    </td>
+                                    <td class="p-3 text-hexGold">Concentrada rigidamente no minúsculo núcleo central.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Localização dos Elétrons</td>
+                                    <td class="p-3">Incrustados diretamente no interior da massa positiva (pudim de
+                                        passas).</td>
+                                    <td class="p-3 text-hexBlue">Orbitando ao redor do núcleo na vasta eletrosfera
+                                        vazia.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Volume & Espaço Atômico</td>
+                                    <td class="p-3">Maciço / Totalmente preenchido por massa positiva contínua.</td>
+                                    <td class="p-3 text-hexBlue">Predominantemente espaço vazio (núcleo ocupa fração
+                                        infinitesimal).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Comportamento das Partículas Alfa</td>
+                                    <td class="p-3 text-hexBlue">Passam todas direto ou sofrem desvios imperceptíveis
+                                        (fraca repulsão).</td>
+                                    <td class="p-3 text-hexRed">Maioria passa direto; algumas sofrem desvios agudos e
+                                        raras ricocheteiam.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Principal Falha / Superação</td>
+                                    <td class="p-3">Incompatível com o espalhamento de partículas alfa em grandes
+                                        ângulos.</td>
+                                    <td class="p-3">Instável perante a eletrodinâmica clássica (colapso do elétron).
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+
+                <div
+                    class="hex-clip bg-hexPanel/95 border border-hexGold/60 p-5 relative hex-glow flex flex-col items-center">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+
+                    <div class="w-full flex items-center justify-between mb-3 border-b border-hexGold/30 pb-2">
+                        <span class="font-cinzel text-xs font-bold tracking-wider text-hexGold flex items-center gap-2">
+                            <i class="fa-solid fa-atom text-hexBlue"></i> Simulador Alfa H-03
+                        </span>
+                        <span id="simModeBadge"
+                            class="text-[10px] bg-hexBlue/20 text-hexBlue px-2 py-0.5 border border-hexBlue/40 hex-clip">Modo:
+                            Thomson</span>
+                    </div>
+
+                    <div
+                        class="w-full h-80 bg-hexDark border border-hexGold/30 rounded relative overflow-hidden flex items-center justify-center shadow-inner my-2">
+                        <canvas id="alphaCanvas" class="w-full h-full cursor-pointer"></canvas>
+                        <div id="canvasOverlayText"
+                            class="absolute bottom-2 left-2 text-[10px] tracking-widest text-hexGold bg-hexDark/80 px-2 py-1 border border-hexGold/30 hex-clip">
+                            Partículas Alfa atravessando o Pudim de Passas
+                        </div>
+                    </div>
+
+                    <div class="w-full grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="setSimulationMode('thomson')" id="btn-sim-thomson"
+                            class="hex-clip-btn bg-hexBlue text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexBlueGlow flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-pie-chart"></i> Testar Thomson
+                        </button>
+                        <button onclick="setSimulationMode('rutherford')" id="btn-sim-rutherford"
+                            class="hex-clip-btn bg-hexDark border border-hexGold text-hexGold font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexGold/20 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-solar-system"></i> Testar Rutherford
+                        </button>
+                    </div>
+
+                    <p class="text-[10px] text-hexGoldLight/60 text-center mt-3">
+                        * Observe o comportamento das partículas vermelhas (Alfa) ao colidirem com os átomos da lâmina
+                        central em cada modelo.
+                    </p>
+                </div>
+
+                <div class="hex-clip bg-hexPanel/90 border border-hexGold/30 p-5 relative">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <h3
+                        class="font-cinzel text-xs font-bold text-hexGold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-hexBlue"></i> Registro do Laboratório
+                    </h3>
+                    <p id="terminalLog" class="text-xs text-hexGoldLight/80 font-mono leading-relaxed">
+                        > Canhão de partículas alfa carregado.<br>
+                        > Selecione um modelo acima para comparar a trajetória das partículas alfa.<br>
+                        > Pronto para experimentação.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer
+        class="border-t border-hexGold/30 bg-hexPanel/90 py-4 px-6 text-center text-xs text-hexGoldLight/60 mt-auto">
+        <p class="font-cinzel tracking-widest">ATOM &bull; HISTORICIDADE ATÔMICA &bull; 1897 - 1911
+        </p>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-hexGold', 'bg-hexGold/10', 'shadow-lg');
+                btn.classList.add('border-hexGold/30', 'bg-hexPanel/80');
+            });
+
+            const targetContent = document.getElementById(`tab-content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-hexGold/30', 'bg-hexPanel/80');
+                targetBtn.classList.add('border-hexGold', 'bg-hexGold/20', 'shadow-lg');
+            }
+
+            const logs = {
+                thomson: "> Módulo 01 carregado: J.J. Thomson e o Pudim de Passas.",
+                experiment: "> Módulo 02 carregado: Detalhes do experimento da lâmina de ouro de Rutherford.",
+                rutherford: "> Módulo 03 carregado: Ernest Rutherford e o Átomo Nuclear Planetário.",
+                comparison: "> Módulo 04 carregado: Matriz comparativa entre os modelos."
+            };
+            document.getElementById('terminalLog').innerHTML = logs[tabId] || "> Dados atualizados.";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('thomson');
+            initCanvasSimulation();
+        });
+
+        let simMode = 'thomson';
+        let canvas, ctx;
+        let alphaParticles = [];
+        let atoms = [];
+
+        function initCanvasSimulation() {
+            canvas = document.getElementById('alphaCanvas');
+            ctx = canvas.getContext('2d');
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            setupAtomsAndParticles();
+            loop();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            setupAtomsAndParticles();
+        }
+
+        function setupAtomsAndParticles() {
+            atoms = [];
+            const foilX = canvas.width * 0.55;
+            const atomSpacing = 35;
+            for (let y = 40; y < canvas.height - 30; y += atomSpacing) {
+                atoms.push({ x: foilX, y: y, radius: 14 });
+            }
+
+            resetAlphaStream();
+        }
+
+        function resetAlphaStream() {
+            alphaParticles = [];
+            for (let i = 0; i < 18; i++) {
+                alphaParticles.push({
+                    x: Math.random() * 60 + 15,
+                    y: Math.random() * (canvas.height - 40) + 20,
+                    vx: 3.5,
+                    vy: 0,
+                    active: true,
+                    deflected: false
+                });
+            }
+        }
+
+        function setSimulationMode(mode) {
+            simMode = mode;
+            const btnThomson = document.getElementById('btn-sim-thomson');
+            const btnRutherford = document.getElementById('btn-sim-rutherford');
+            const badge = document.getElementById('simModeBadge');
+            const overlay = document.getElementById('canvasOverlayText');
+
+            if (mode === 'thomson') {
+                btnThomson.className = "hex-clip-btn bg-hexBlue text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexBlueGlow flex items-center justify-center gap-1.5";
+                btnRutherford.className = "hex-clip-btn bg-hexDark border border-hexGold text-hexGold font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexGold/20 flex items-center justify-center gap-1.5";
+                badge.innerText = "Modo: Thomson";
+                badge.className = "text-[10px] bg-hexBlue/20 text-hexBlue px-2 py-0.5 border border-hexBlue/40 hex-clip";
+                overlay.innerText = "Partículas atravessam o Pudim de Passas sem grandes desvios";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para Modelo de Thomson: Carga positiva difusa não gera repulsão forte.";
+            } else {
+                btnRutherford.className = "hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5";
+                btnThomson.className = "hex-clip-btn bg-hexDark border border-hexBlue text-hexBlue font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexBlue/20 flex items-center justify-center gap-1.5";
+                badge.innerText = "Modo: Rutherford";
+                badge.className = "text-[10px] bg-hexGold/20 text-hexGold px-2 py-0.5 border border-hexGold/40 hex-clip";
+                overlay.innerText = "Partículas sofrem desvios agudos e ricocheteiam no núcleo denso";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para Modelo de Rutherford: Núcleo central denso desvia fortemente as partículas alfa.";
+            }
+            resetAlphaStream();
+        }
+
+        function loop() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(10, canvas.height / 2 - 25, 35, 50);
+            ctx.strokeStyle = '#c89b3c';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, canvas.height / 2 - 25, 35, 50);
+            ctx.fillStyle = '#c89b3c';
+            ctx.font = '9px Cinzel, sans-serif';
+            ctx.fillText('EMISSOR', 13, canvas.height / 2 - 30);
+
+            atoms.forEach(atom => {
+                if (simMode === 'thomson') {
+                    ctx.beginPath();
+                    ctx.arc(atom.x, atom.y, atom.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(240, 66, 66, 0.15)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(240, 66, 66, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.closePath();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(atom.x, atom.y, atom.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(11, 198, 227, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+
+                    ctx.beginPath();
+                    ctx.arc(atom.x, atom.y, 3.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#c89b3c';
+                    ctx.shadowColor = '#f0e6d2';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                }
+            });
+
+            ctx.fillStyle = '#c89b3c';
+            ctx.font = '10px Cinzel, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Lâmina de Ouro', atoms[0] ? atoms[0].x : canvas.width * 0.55, 20);
+
+            alphaParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                atoms.forEach(atom => {
+                    const dx = p.x - atom.x;
+                    const dy = p.y - atom.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < atom.radius && !p.deflected) {
+                        p.deflected = true;
+                        if (simMode === 'thomson') {
+                            p.vy += (Math.random() - 0.5) * 0.6;
+                        } else {
+                            if (dist < 4) {
+                                p.vx = -p.vx * 0.9;
+                                p.vy = (Math.random() - 0.5) * 2;
+                            } else {
+                                p.vx = (Math.random() * 2) - 0.5;
+                                p.vy = (Math.random() - 0.5) * 6;
+                            }
+                        }
+                    }
+                });
+
+                if (p.x > canvas.width + 20 || p.x < -30 || p.y > canvas.height + 20 || p.y < -20) {
+                    p.x = 25;
+                    p.y = Math.random() * (canvas.height - 40) + 20;
+                    p.vx = 3.5;
+                    p.vy = 0;
+                    p.deflected = false;
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#f04242';
+                ctx.shadowColor = '#f04242';
+                ctx.shadowBlur = 8;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.closePath();
+            });
+
+            requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+
+</html>

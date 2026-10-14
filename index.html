@@ -59,6 +59,14 @@
                 <li>Reações químicas são rearranjos de átomos.</li>
             </ul>
         </div>
+        <a href="./modelos/DtoT.html" id="link1" class="more"><ion-icon name="hourglass-outline"></ion-icon>Mais
+            história</a>
+        <a href="./modelos/TtoR.html" id="link2" class="more"><ion-icon name="hourglass-outline"></ion-icon>Mais
+            história</a>
+        <a href="./modelos/RtoB.html" id="link3" class="more"><ion-icon name="hourglass-outline"></ion-icon>Mais
+            história</a>
+        <a href="./modelos/BtoS.html" id="link4" class="more"><ion-icon name="hourglass-outline"></ion-icon>Mais
+            história</a>
     </div>
 
     <div class="controls-panel">
@@ -77,6 +85,16 @@
         let animatableObjects = [];
         let isAutoRotating = true;
         let currentModelIndex = 0;
+
+        let l1 = document.getElementById("link1");
+        let l2 = document.getElementById("link2");
+        let l3 = document.getElementById("link3");
+        let l4 = document.getElementById("link4");
+
+        l1.style.display = 'none';
+        l2.style.display = 'none';
+        l3.style.display = 'none';
+        l4.style.display = 'none';
 
         function init3D() {
             const container = document.getElementById('webgl-container');
@@ -175,6 +193,11 @@
         }
 
         function buildDaltonModel() {
+            l1.style.display = '';
+            l2.style.display = 'none';
+            l3.style.display = 'none';
+            l4.style.display = 'none';
+
             const geo = new THREE.SphereGeometry(4.5, 64, 64);
             const mat = new THREE.MeshStandardMaterial({
                 color: 0xc8aa6e,
@@ -187,6 +210,11 @@
         }
 
         function buildThomsonModel() {
+            l1.style.display = '';
+            l2.style.display = 'none';
+            l3.style.display = 'none';
+            l4.style.display = 'none';
+
             const mainGeo = new THREE.SphereGeometry(5, 32, 32);
             const mainMat = new THREE.MeshPhongMaterial({
                 color: 0x785a28,
@@ -216,6 +244,11 @@
         }
 
         function buildRutherfordModel() {
+            l1.style.display = 'none';
+            l2.style.display = '';
+            l3.style.display = 'none';
+            l4.style.display = 'none';
+
             const nucleusGeo = new THREE.SphereGeometry(1.2, 32, 32);
             const nucleusMat = new THREE.MeshStandardMaterial({ color: 0xe84057, emissive: 0x500000 });
             const nucleus = new THREE.Mesh(nucleusGeo, nucleusMat);
@@ -246,6 +279,11 @@
         }
 
         function buildBohrModel() {
+            l1.style.display = 'none';
+            l2.style.display = 'none';
+            l3.style.display = '';
+            l4.style.display = 'none';
+
             const nucleusGroup = new THREE.Group();
             for (let i = 0; i < 10; i++) {
                 const isProton = i % 2 === 0;
@@ -296,6 +334,11 @@
         }
 
         function buildSchrodingerModel() {
+            l1.style.display = 'none';
+            l2.style.display = 'none';
+            l3.style.display = 'none';
+            l4.style.display = '';
+            
             const nGeo = new THREE.SphereGeometry(0.5, 16, 16);
             const nMat = new THREE.MeshBasicMaterial({ color: 0xf0e6d2 });
             const nucleus = new THREE.Mesh(nGeo, nMat);
@@ -403,6 +446,8 @@
         }
         window.onload = init3D;
     </script>
+    <script type="module" src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.js"></script>
 </body>
 
 </html>

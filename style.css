@@ -30,7 +30,6 @@ html {
     color: var(--lol-gold-1);
 }
 
-/* Canvas 3D */
 #webgl-container {
     position: absolute;
     top: 0;
@@ -40,7 +39,6 @@ html {
     z-index: 1;
 }
 
-/* Moldura ornamental League of Legends */
 .hextech-frame {
     position: absolute;
     inset: 0;
@@ -59,7 +57,6 @@ html {
     background: linear-gradient(90deg, transparent, var(--lol-gold-2), transparent);
 }
 
-/* NAV BAR / HEADER */
 header {
     position: absolute;
     top: 0;
@@ -137,7 +134,6 @@ header {
     box-shadow: 0 0 15px var(--lol-hextech-blue);
 }
 
-/* TELA INICIAL (SPLASH SCREEN / PRESENTATION) */
 #welcome-screen {
     position: absolute;
     inset: 0;
@@ -185,7 +181,6 @@ header {
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
 }
 
-/* PAINEL DE NAVEGAÇÃO DOS MODELOS (INFERIOR) */
 .controls-panel {
     position: absolute;
     bottom: 25px;
@@ -203,7 +198,6 @@ header {
     overflow-x: auto;
 }
 
-/* CARD INFORMATIVO HISTÓRICO (LATERAL) */
 .info-card {
     position: absolute;
     top: 90px;
@@ -257,7 +251,6 @@ header {
     line-height: 1.5;
 }
 
-/* CONTROLES EXTRAS DO SIMULADOR (ESQUERDA) */
 .sim-settings {
     position: absolute;
     top: 90px;
@@ -278,7 +271,6 @@ header {
     font-size: 1.1rem;
 }
 
-/* DICAS / TUTORIAL SOBRE O CANVAS */
 .canvas-hint {
     position: absolute;
     bottom: 90px;
@@ -293,7 +285,6 @@ header {
     opacity: 0.7;
 }
 
-/* CUSTOM SCROLLBAR (ESTILO LOL) */
 ::-webkit-scrollbar {
     width: 5px;
 }
@@ -311,7 +302,14 @@ header {
     background: var(--lol-gold-2);
 }
 
-/* ADAPTATIVIDADE MOBILE (ANDROID & PC) */
+.more{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    color: #cdbe91;
+    padding: 6px 0px;
+}
+
 @media (max-width: 768px) {
     header {
         height: 60px;

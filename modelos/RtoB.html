@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom | Rutherford &rarr; Bohr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        hexDark: '#070a10',
+                        hexPanel: '#0a101d',
+                        hexBorder: '#1e293b',
+                        hexGold: '#c89b3c',
+                        hexGoldLight: '#f0e6d2',
+                        hexGoldDark: '#785a28',
+                        hexBlue: '#0bc6e3',
+                        hexBlueGlow: '#00f2ff',
+                        hexRed: '#f04242',
+                        hexPurple: '#9333ea',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hex-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+        .hex-clip-btn {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .hex-corner-tl {
+            position: absolute;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            border-top: 2px solid #c89b3c;
+            border-left: 2px solid #c89b3c;
+        }
+        .hex-corner-br {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 8px; height: 8px;
+            border-bottom: 2px solid #c89b3c;
+            border-right: 2px solid #c89b3c;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c89b3c;
+            border-radius: 3px;
+        }
+        .hex-glow {
+            box-shadow: 0 0 20px rgba(12, 198, 227, 0.15), inset 0 0 15px rgba(200, 155, 60, 0.1);
+        }
+        .hex-gold-glow {
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.6);
+        }
+        .hex-grid-bg {
+            background-image: linear-gradient(rgba(200, 155, 60, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(200, 155, 60, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-hexDark text-hexGoldLight font-sans min-h-screen hex-grid-bg flex flex-col relative overflow-x-hidden selection:bg-hexGold selection:text-hexDark">
+
+    <header class="border-b border-hexGold/30 bg-hexPanel/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-12 py-3 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 hex-clip bg-gradient-to-br from-hexGold to-hexGoldDark flex items-center justify-center border border-hexGold/60 shadow-lg">
+                <i class="fa-solid fa-atom text-hexDark text-lg animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+                <h1 class="font-cinzel font-black tracking-widest text-lg lg:text-xl text-hexGold hex-gold-glow uppercase">Atom // Linha Temporal</h1>
+                <p class="text-xs text-hexBlue tracking-wider">Módulos de Pesquisa Atômica: Rutherford &rarr; Bohr</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-3 bg-hexDark/80 border border-hexGold/30 px-4 py-1.5 hex-clip">
+            <span class="w-2 h-2 rounded-full bg-hexBlue animate-ping"></span>
+            <span class="text-xs tracking-widest uppercase text-hexGoldLight">Status: Conexão Estável com o Núcleo Quântico</span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 flex flex-col gap-8">
+
+        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" aria-label="Abas de Navegação">
+            <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/60 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 01</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Visão Geral</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+            
+            <button onclick="switchTab('rutherford')" id="btn-rutherford" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 02</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo Rutherford</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('transition')" id="btn-transition" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 03</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">A Crise Eletrodinâmica</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('bohr')" id="btn-bohr" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 04</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo de Bohr</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('comparison')" id="btn-comparison" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden col-span-2 sm:col-span-1">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 05</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Comparativo & Simulação</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+        </nav>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+
+                <div id="tab-content-overview" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scroll text-hexGold text-2xl"></i>
+                        <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">A Revolução do Núcleo e das Órbitas</h2>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Após a queda do modelo de Thomson, a física atômica deu um salto colossal nas primeiras décadas do século XX. Ernest Rutherford descobriu que o átomo possuía um centro denso e minúsculo — o núcleo —, dando origem ao modelo planetário.
+                        </p>
+                        <p>
+                            Contudo, as leis clássicas da física previam que esse modelo colapsaria instantaneamente. Foi aí que o dinamarquês Niels Bohr introduziu os conceitos revolucionários da <strong>quantização de energia</strong>, salvando o átomo e abrindo as portas para a mecânica quântica moderna.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                            <div class="p-4 bg-hexDark/60 border border-hexGold/30 hex-clip">
+                                <h3 class="font-cinzel text-hexGold font-bold mb-1">1911 - Ernest Rutherford</h3>
+                                <p class="text-xs text-hexGoldLight/70">O átomo nuclear: espaço amplamente vazio com um núcleo positivo central e elétrons orbitando ao redor.</p>
+                            </div>
+                            <div class="p-4 bg-hexDark/60 border border-hexBlue/30 hex-clip">
+                                <h3 class="font-cinzel text-hexBlue font-bold mb-1">1913 - Niels Bohr</h3>
+                                <p class="text-xs text-hexGoldLight/70">Órbitas estacionárias e saltos quânticos: elétrons em níveis de energia fixos sem emitir radiação contínua.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-content-rutherford" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-solar-system text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de Ernest Rutherford (1911)</h2>
+                            <p class="text-xs text-hexBlue">O Modelo Planetário</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Através do famoso experimento de espalhamento de partículas alfa (bombardeando uma lâmina de ouro ultrafina), Rutherford percebeu que a maioria das partículas passava direto, pouquíssimas sofriam grandes desvios e algumas ricocheteavam. Isso provou que:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexGold/50">
+                            <li><strong class="text-hexGold">1. Núcleo Atômico:</strong> Praticamente toda a massa e a carga positiva do átomo estão concentradas em uma região minúscula e extremamente densa chamada núcleo.</li>
+                            <li><strong class="text-hexGold">2. Espaço Vazio:</strong> O restante do átomo é um imenso vazio onde os elétrons se movem.</li>
+                            <li><strong class="text-hexGold">3. Órbitas Livres:</strong> Os elétrons giravam ao redor do núcleo em trajetórias circulares, de forma análoga aos planetas ao redor do Sol.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexGold/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexGold uppercase block mb-1">O Grande Dilema:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                Pela eletrodinâmica clássica (Maxwell), qualquer carga elétrica acelerada (como um elétron em órbita curva) deveria irradiar energia continuamente, perdendo velocidade e despencando em direção ao núcleo em frações de segundo. O átomo de Rutherford era instável na teoria clássica.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-transition" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-triangle-exclamation text-hexRed text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">A Crise Eletrodinâmica & Espectros</h2>
+                            <p class="text-xs text-hexRed">O Colapso Teórico de Rutherford</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            A física do século XIX entrou em colapso diante de duas evidências que o modelo planetário puro não conseguia resolver:
+                        </p>
+                        <div class="p-4 bg-hexDark/90 border border-hexRed/50 hex-clip my-4">
+                            <h3 class="font-cinzel text-hexRed font-bold text-sm mb-2"><i class="fa-solid fa-fire mr-2"></i>O Mistério dos Espectros Atômicos</h3>
+                            <p class="text-xs text-hexGoldLight/80 leading-relaxed">
+                                Quando gases aquecidos emitiam luz através de prismas, eles não geravam um arco-íris contínuo, mas sim linhas discretas e específicas (espectros de emissão). Se o elétron pudesse ocupar qualquer órbita livremente, a energia emitida seria contínua, o que contradizia os experimentos de laboratório.
+                            </p>
+                        </div>
+                        <p>
+                            Era preciso introducer uma nova audácia teórica: a quantização de Max Planck e Albert Einstein aplicada ao átomo. Niels Bohr aceitou o desafio em Copenhague.
+                        </p>
+                    </div>
+                </div>
+                <div id="tab-content-bohr" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-layer-group text-hexBlue text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de Niels Bohr (1913)</h2>
+                            <p class="text-xs text-hexBlue">As Órbitas Estacionárias e Saltos Quânticos</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Niels Bohr manteve o núcleo positivo de Rutherford, mas impôs postulados quânticos revolucionários para estabilizar os elétrons:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexBlue/50">
+                            <li><strong class="text-hexBlue">1. Órbitas Estacionárias:</strong> Os elétrons só podem girar em órbitas circulares específicas ao redor do núcleo, chamadas de níveis de energia ou camadas (K, L, M, N, O, P, Q), onde <em>não</em> emitem nem absorvem energia.</li>
+                            <li><strong class="text-hexBlue">2. Quantização do Momento:</strong> Apenas órbitas cujos momentos angulares são múltiplos inteiros de h/2π são permitidas.</li>
+                            <li><strong class="text-hexBlue">3. Saltos Quânticos (Quanta):</strong> Um elétron só ganha ou perde energia quando salta de uma órbita para outra. Ao absorver energia, pula para uma camada mais externa; ao retornar, emite um fóton de luz com frequência exata ΔE = hf.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexBlue/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexBlue uppercase block mb-1">Acertos & Limitações Históricas:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                <strong>Acerto:</strong> Explicou com precisão cirúrgica o espectro de emissão do átomo de hidrogênio. <br>
+                                <strong>Limitação:</strong> Falhava ao tentar explicar átomos multieletrônicos (com mais de um elétron) e não descrevia a dualidade onda-partícula completa (que depois deu origem ao modelo quântico de Schrödinger/Heisenberg).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-content-comparison" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scale-balanced text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">Comparativo Direto: Rutherford vs. Bohr</h2>
+                            <p class="text-xs text-hexBlue">A Evolução Quântica</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs lg:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-hexGold/40 bg-hexDark/60 text-hexGold font-cinzel">
+                                    <th class="p-3">Critério Analítico</th>
+                                    <th class="p-3 text-hexGold">Modelo de Rutherford (1911)</th>
+                                    <th class="p-3 text-hexBlue">Modelo de Bohr (1913)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-hexBorder text-hexGoldLight/90">
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Estrutura do Elétron</td>
+                                    <td class="p-3">Órbitas circulares aleatórias e sem restrição de raio.</td>
+                                    <td class="p-3">Órbitas estacionárias quantizadas (camadas fixas).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Estabilidade Energética</td>
+                                    <td class="p-3 text-hexRed">Instável (perderia energia continuamente e colapsaria).</td>
+                                    <td class="p-3 text-hexBlue">Estável (não emite energia enquanto estiver na órbita fixa).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Emissão de Luz</td>
+                                    <td class="p-3">Espetro contínuo previsto incorretamente.</td>
+                                    <td class="p-3">Saltos quânticos discretos gerando fótons com frequências exatas.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Analogia Popular</td>
+                                    <td class="p-3">Sistema Solar (planetas orbitando o Sol).</td>
+                                    <td class="p-3">Trilhos de trem circulares em diferentes altitudes.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Principal Limitação</td>
+                                    <td class="p-3">Não explica o espectro do hidrogênio nem a estabilidade atômica.</td>
+                                    <td class="p-3">Falha em átomos complexos com múltiplos elétrons.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+                
+                <div class="hex-clip bg-hexPanel/95 border border-hexGold/60 p-5 relative hex-glow flex flex-col items-center">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    
+                    <div class="w-full flex items-center justify-between mb-3 border-b border-hexGold/30 pb-2">
+                        <span class="font-cinzel text-xs font-bold tracking-wider text-hexGold flex items-center gap-2">
+                            <i class="fa-solid fa-cube text-hexBlue"></i> Simulador Arcano H-02
+                        </span>
+                        <span class="text-[10px] bg-hexBlue/20 text-hexBlue px-2 py-0.5 border border-hexBlue/40 hex-clip">Holograma Ativo</span>
+                    </div>
+
+                    <div class="w-full h-64 bg-hexDark border border-hexGold/30 rounded relative overflow-hidden flex items-center justify-center shadow-inner my-2">
+                        <canvas id="atomicCanvas" class="w-full h-full cursor-pointer"></canvas>
+                        <div id="canvasOverlayText" class="absolute bottom-2 left-2 text-[10px] tracking-widest text-hexGold bg-hexDark/80 px-2 py-1 border border-hexGold/30 hex-clip">
+                            Modo: Rutherford (Planetário)
+                        </div>
+                    </div>
+
+                    <div class="w-full grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="setSimulationModel('rutherford')" id="sim-btn-rutherford" class="hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-solar-system"></i> Rutherford
+                        </button>
+                        <button onclick="setSimulationModel('bohr')" id="sim-btn-bohr" class="hex-clip-btn bg-hexDark border border-hexBlue text-hexBlue font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexBlue/20 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-atom"></i> Bohr
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-hexGoldLight/60 text-center mt-3">
+                        * Alterne entre os modelos para visualizar a transição do sistema planetário livre para as órbitas quantizadas.
+                    </p>
+                </div>
+
+                <div class="hex-clip bg-hexPanel/90 border border-hexGold/30 p-5 relative">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <h3 class="font-cinzel text-xs font-bold text-hexGold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-hexBlue"></i> Registro de Pesquisa
+                    </h3>
+                    <p id="terminalLog" class="text-xs text-hexGoldLight/80 font-mono leading-relaxed">
+                        > Sistema inicializado com sucesso.<br>
+                        > Selecione um módulo à esquerda para carregar a evolução atômica de Rutherford a Bohr.<br>
+                        > Ready...
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="border-t border-hexGold/30 bg-hexPanel/90 py-4 px-6 text-center text-xs text-hexGoldLight/60 mt-auto">
+        <p class="font-cinzel tracking-widest">ATOM &bull; HISTORICIDADE ATÔMICA &bull; 1911 - 1913</p>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-hexGold', 'bg-hexGold/10', 'shadow-lg');
+                btn.classList.add('border-hexGold/30', 'bg-hexPanel/80');
+            });
+
+            const targetContent = document.getElementById(`tab-content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-hexGold/30', 'bg-hexPanel/80');
+                targetBtn.classList.add('border-hexGold', 'bg-hexGold/20', 'shadow-lg');
+            }
+
+            const logs = {
+                overview: "> Módulo 01 carregado: Visão geral da jornada do núcleo ao salto quântico.",
+                rutherford: "> Módulo 02 carregado: Ernest Rutherford e o Modelo Planetário (1911).",
+                transition: "> Módulo 03 carregado: A crise eletrodinâmica clássica e os espectros de emissão.",
+                bohr: "> Módulo 04 carregado: Niels Bohr e as órbitas estacionárias quantizadas (1913).",
+                comparison: "> Módulo 05 carregado: Tabela comparativa e simulação quântica ativada."
+            };
+            document.getElementById('terminalLog').innerHTML = logs[tabId] || "> Dados atualizados.";
+
+            if (tabId === 'rutherford') {
+                setSimulationModel('rutherford');
+            } else if (tabId === 'bohr') {
+                setSimulationModel('bohr');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('overview');
+            initCanvasSimulation();
+        });
+
+        let currentSimModel = 'rutherford';
+        let canvas, ctx;
+        let animationFrameId;
+        let rutherfordElectrons = [];
+        let bohrOrbits = [];
+
+        function initCanvasSimulation() {
+            canvas = document.getElementById('atomicCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            for (let i = 0; i < 3; i++) {
+                rutherfordElectrons.push({
+                    angle: (Math.PI * 2 / 3) * i,
+                    distanceX: 70 + i * 10,
+                    distanceY: 35 + i * 15,
+                    speed: 0.04 + i * 0.01
+                });
+            }
+
+            bohrOrbits = [
+                { radius: 35, speed: 0.05, angle: 0 },
+                { radius: 60, speed: 0.03, angle: 2 },
+                { radius: 85, speed: 0.015, angle: 4 }
+            ];
+
+            loop();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+        }
+
+        function setSimulationModel(model) {
+            currentSimModel = model;
+            const btnRutherford = document.getElementById('sim-btn-rutherford');
+            const btnBohr = document.getElementById('sim-btn-bohr');
+            const overlay = document.getElementById('canvasOverlayText');
+
+            if (model === 'rutherford') {
+                btnRutherford.className = "hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5";
+                btnBohr.className = "hex-clip-btn bg-hexDark border border-hexBlue text-hexBlue font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexBlue/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Rutherford (Órbitas Planetárias Livres)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Rutherford.";
+            } else {
+                btnBohr.className = "hex-clip-btn bg-hexBlue text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexBlueGlow flex items-center justify-center gap-1.5";
+                btnRutherford.className = "hex-clip-btn bg-hexDark border border-hexGold text-hexGold font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexGold/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Bohr (Camadas Estacionárias Quantizadas)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Bohr (Camadas K, L, M).";
+            }
+        }
+
+        function loop() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
+            const coreGrad = ctx.createRadialGradient(centerX - 3, centerY - 3, 2, centerX, centerY, 12);
+            coreGrad.addColorStop(0, '#f04242');
+            coreGrad.addColorStop(1, '#781c1c');
+            ctx.fillStyle = coreGrad;
+            ctx.shadowColor = '#f04242';
+            ctx.shadowBlur = 12;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.closePath();
+
+            ctx.fillStyle = '#f0e6d2';
+            ctx.font = 'bold 8px Cinzel, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('NÚCLEO', centerX, centerY + 22);
+
+            if (currentSimModel === 'rutherford') {
+                rutherfordElectrons.forEach(e => {
+                    e.angle += e.speed;
+                    const x = centerX + Math.cos(e.angle) * e.distanceX;
+                    const y = centerY + Math.sin(e.angle) * e.distanceY;
+
+                    ctx.beginPath();
+                    ctx.ellipse(centerX, centerY, e.distanceX, e.distanceY, e.angle * 0.2, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(200, 155, 60, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.closePath();
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0bc6e3';
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                });
+
+            } else {
+                bohrOrbits.forEach((orbit, index) => {
+                    orbit.angle += orbit.speed;
+                    
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, orbit.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = index === 0 ? 'rgba(11, 198, 227, 0.4)' : index === 1 ? 'rgba(200, 155, 60, 0.4)' : 'rgba(147, 51, 234, 0.4)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.closePath();
+
+                    const ex = centerX + Math.cos(orbit.angle) * orbit.radius;
+                    const ey = centerY + Math.sin(orbit.angle) * orbit.radius;
+
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0bc6e3';
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 10;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                });
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>

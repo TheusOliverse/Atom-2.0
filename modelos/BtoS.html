@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom | Bohr &rarr; Schrödinger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        hexDark: '#070a10',
+                        hexPanel: '#0a101d',
+                        hexBorder: '#1e293b',
+                        hexGold: '#c89b3c',
+                        hexGoldLight: '#f0e6d2',
+                        hexGoldDark: '#785a28',
+                        hexBlue: '#0bc6e3',
+                        hexBlueGlow: '#00f2ff',
+                        hexPurple: '#a855f7',
+                        hexPurpleGlow: '#c084fc',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hex-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+
+        .hex-clip-btn {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .hex-corner-tl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #c89b3c;
+            border-left: 2px solid #c89b3c;
+        }
+
+        .hex-corner-br {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid #c89b3c;
+            border-right: 2px solid #c89b3c;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #070a10;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c89b3c;
+            border-radius: 3px;
+        }
+
+        .hex-glow {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), inset 0 0 15px rgba(200, 155, 60, 0.1);
+        }
+
+        .hex-gold-glow {
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.6);
+        }
+
+        .hex-grid-bg {
+            background-image: linear-gradient(rgba(200, 155, 60, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 155, 60, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-hexDark text-hexGoldLight font-sans min-h-screen hex-grid-bg flex flex-col relative overflow-x-hidden selection:bg-hexPurple selection:text-hexDark">
+
+    <header
+        class="border-b border-hexGold/30 bg-hexPanel/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-12 py-3 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-4">
+            <div
+                class="w-10 h-10 hex-clip bg-gradient-to-br from-hexPurple to-hexGold flex items-center justify-center border border-hexGold/60 shadow-lg">
+                <i class="fa-solid fa-atom text-hexDark text-lg animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+                <h1
+                    class="font-cinzel font-black tracking-widest text-lg lg:text-xl text-hexGold hex-gold-glow uppercase">
+                    Atom // Linha Temporal</h1>
+                <p class="text-xs text-hexPurple tracking-wider">Módulos de Pesquisa Quântica: Bohr &rarr; Schrödinger
+                </p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-3 bg-hexDark/80 border border-hexGold/30 px-4 py-1.5 hex-clip">
+            <span class="w-2 h-2 rounded-full bg-hexPurple animate-ping"></span>
+            <span class="text-xs tracking-widest uppercase text-hexGoldLight">Status: Conexão Estável com o Campo de
+                Probabilidade</span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 flex flex-col gap-8">
+
+        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" aria-label="Abas de Navegação">
+            <button onclick="switchTab('overview')" id="btn-overview"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/60 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 01</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexPurple transition-colors">Visão
+                    Geral</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('bohr')" id="btn-bohr"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 02</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexPurple transition-colors">Modelo
+                    de Bohr</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('transition')" id="btn-transition"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 03</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexPurple transition-colors">A
+                    Dualidade & Incerteza</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('schrodinger')" id="btn-schrodinger"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 04</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexPurple transition-colors">Modelo
+                    de Schrödinger</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('comparison')" id="btn-comparison"
+                class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden col-span-2 sm:col-span-1">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 05</span>
+                <span
+                    class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexPurple transition-colors">Comparativo
+                    & Simulação</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+        </nav>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+
+                <div id="tab-content-overview"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scroll text-hexGold text-2xl"></i>
+                        <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">Do Trilho Fixo à Nuvem
+                            Probabilística</h2>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            O modelo de Niels Bohr representou um triunfo extraordinário ao incorporar a quantização
+                            para explicar o átomo de hidrogênio. Contudo, tratar o elétron estritamente como uma
+                            partícula pontual girando em órbitas circulares bem definidas logo se mostrou insuficiente
+                            para a complexidade universal da matéria.
+                        </p>
+                        <p>
+                            Neste módulo, cruzamos a fronteira que leva das órbitas rígidas de Bohr à elegante e
+                            complexa mecânica ondulatória de Erwin Schrödinger, onde o elétron deixa de ter uma
+                            trajetória exata e passa a ser regido por funções de onda e <strong>orbitais de
+                                probabilidade</strong>.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                            <div class="p-4 bg-hexDark/60 border border-hexGold/30 hex-clip">
+                                <h3 class="font-cinzel text-hexGold font-bold mb-1">1913 - Niels Bohr</h3>
+                                <p class="text-xs text-hexGoldLight/70">Órbitas circulares planas e estacionárias com
+                                    raios e energias rigidamente definidos.</p>
+                            </div>
+                            <div class="p-4 bg-hexDark/60 border border-hexPurple/30 hex-clip">
+                                <h3 class="font-cinzel text-hexPurple font-bold mb-1">1926 - Erwin Schrödinger</h3>
+                                <p class="text-xs text-hexGoldLight/70">Equação de Onda fundamental: o elétron como onda
+                                    de matéria descrita em regiões de alta probabilidade (orbitais).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-bohr"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-circle-dot text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de Niels Bohr
+                                (1913)</h2>
+                            <p class="text-xs text-hexPurple">Órbitas Estacionárias Clássico-Quânticas</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            O modelo de Bohr baseava-se em premissas semi-clássicas onde os elétrons orbitavam o núcleo
+                            em trajetórias perfeitamente previsíveis, semelhantes a trilhos geométricos. Seus pilares
+                            centrais eram:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexGold/50">
+                            <li><strong class="text-hexGold">1. Camadas Eletrônicas Fixas:</strong> Os elétrons
+                                habitavam níveis específicos de energia (K, L, M, N...).</li>
+                            <li><strong class="text-hexGold">2. Trajetória Determinística:</strong> Em cada camada, a
+                                posição e a velocidade do elétron podiam, em tese, ser mapeadas de forma exata.</li>
+                            <li><strong class="text-hexGold">3. Saltos Quânticos:</strong> A transição entre camadas
+                                ocorria de forma instantânea com emissão ou absorção de fótons quantizados.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexGold/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexGold uppercase block mb-1">Limitações
+                                Avançadas:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                Ao aplicar o modelo a átomos maiores que o hidrogênio, as linhas espectrais se dividiam
+                                de modo que as órbitas circulares planas não conseguiam justificar, exigindo a
+                                introdução de subníveis (modelo de Sommerfeld) e, subsequentemente, uma revisão radical
+                                da física.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-transition"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-wave-square text-hexPurple text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">A Dualidade e o Princípio
+                                da Incerteza</h2>
+                            <p class="text-xs text-hexPurple">A Queda do Determinismo Estrito</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Nos anos 1920, a física passou por uma reviravolta conceitual profunda que invalidou a ideia
+                            de órbitas estritas:
+                        </p>
+                        <div class="p-4 bg-hexDark/90 border border-hexPurple/50 hex-clip my-4">
+                            <h3 class="font-cinzel text-hexPurple font-bold text-sm mb-2"><i
+                                    class="fa-solid fa-bolt mr-2"></i>De Broglie & Heisenberg</h3>
+                            <p class="text-xs text-hexGoldLight/80 leading-relaxed">
+                                <strong>Louis de Broglie</strong> propôs que o elétron não era apenas uma partícula, mas
+                                possuía natureza ondulatória (dualidade onda-partícula). Logo depois, <strong>Werner
+                                    Heisenberg</strong> formulou o <em>Princípio da Incerteza</em>: é impossível
+                                determinar simultaneamente e com exatidão absoluta a posição e o momento (velocidade) de
+                                um elétron. Consequentemente, desenhar "trilhos" fixos tornava-se matematicamente
+                                impossível.
+                            </p>
+                        </div>
+                        <p>
+                            Isso abriu espaço para Erwin Schrödinger formular sua famosa equação diferencial baseada em
+                            ondas.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="tab-content-schrodinger"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-cloud text-hexPurple text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de Erwin
+                                Schrödinger (1926)</h2>
+                            <p class="text-xs text-hexPurple">O Modelo Quântico-Ondulatório (Orbitais)</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            O físico austríaco Erwin Schrödinger formulou uma equação matemática de ondas que trata o
+                            elétron como uma função de onda psi. As principais características deste modelo atual são:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexPurple/50">
+                            <li><strong class="text-hexPurple">1. Função de Onda & Densidade:</strong> O quadrado da
+                                função de onda indica a <em>probabilidade</em> de encontrar o elétron em uma dada região
+                                do espaço ao redor do núcleo.</li>
+                            <li><strong class="text-hexPurple">2. Orbitais Atômicos:</strong> Em vez de órbitas planas
+                                (trilhos), surgem os <strong>orbitais</strong> — regiões tridimensionais com formatos
+                                específicos (s, p, d, f) que delimitam onde há 90% ou mais de chance de localizar o
+                                elétron.</li>
+                            <li><strong class="text-hexPurple">3. Números Quânticos:</strong> O estado de cada elétron é
+                                descrito por quatro parâmetros quânticos (principal, azimutal, magnético e de spin),
+                                definindo com rigor sua energia e comportamento espacial.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexPurple/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexPurple uppercase block mb-1">O Triunfo
+                                Definitivo:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                O modelo quântico de Schrödinger resolveu com perfeição os espectros de emissão de todos
+                                os elementos químicos conhecidos, servindo de base para a química moderna, física de
+                                materiais e tecnologia de semicondutores.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-comparison"
+                    class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scale-balanced text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">Comparativo Direto: Bohr
+                                vs. Schrödinger</h2>
+                            <p class="text-xs text-hexPurple">Do Determinismo à Estatística Quântica</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs lg:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-hexGold/40 bg-hexDark/60 text-hexGold font-cinzel">
+                                    <th class="p-3">Critério Analítico</th>
+                                    <th class="p-3 text-hexGold">Modelo de Bohr (1913)</th>
+                                    <th class="p-3 text-hexPurple">Modelo de Schrödinger (1926)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-hexBorder text-hexGoldLight/90">
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Trajetória do Elétron</td>
+                                    <td class="p-3">Órbitas circulares planas e rígidas (trilhos definidos).</td>
+                                    <td class="p-3">Inexistente; o elétron é descrito por ondas de probabilidade.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Geometria Espacial</td>
+                                    <td class="p-3">Bidimensional (camadas circulares ao redor do núcleo).</td>
+                                    <td class="p-3">Tridimensional (orbitais esféricos, bilobados, complexos).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Conceito de Localização</td>
+                                    <td class="p-3">Determinístico (sabe-se exatamente onde o elétron está na órbita).
+                                    </td>
+                                    <td class="p-3">Probabilístico (nuvem de densidade eletrônica / incerteza).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Parâmetros de Descrição</td>
+                                    <td class="p-3">Apenas o Número Quântico Principal (n).</td>
+                                    <td class="p-3">Quatro Números Quânticos (n, l, ml, ms).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Abrangência e Precisão</td>
+                                    <td class="p-3">Funciona bem apenas para átomos monoeletrônicos (Hidrogênio).</td>
+                                    <td class="p-3">Abrangente e preciso para todos os elementos da tabela periódica.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+
+                <div
+                    class="hex-clip bg-hexPanel/95 border border-hexGold/60 p-5 relative hex-glow flex flex-col items-center">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+
+                    <div class="w-full flex items-center justify-between mb-3 border-b border-hexGold/30 pb-2">
+                        <span class="font-cinzel text-xs font-bold tracking-wider text-hexGold flex items-center gap-2">
+                            <i class="fa-solid fa-cube text-hexPurple"></i> Simulador H-03
+                        </span>
+                        <span
+                            class="text-[10px] bg-hexPurple/20 text-hexPurple px-2 py-0.5 border border-hexPurple/40 hex-clip">Holograma
+                            Ativo</span>
+                    </div>
+
+                    <div
+                        class="w-full h-64 bg-hexDark border border-hexGold/30 rounded relative overflow-hidden flex items-center justify-center shadow-inner my-2">
+                        <canvas id="atomicCanvas" class="w-full h-full cursor-pointer"></canvas>
+                        <div id="canvasOverlayText"
+                            class="absolute bottom-2 left-2 text-[10px] tracking-widest text-hexGold bg-hexDark/80 px-2 py-1 border border-hexGold/30 hex-clip">
+                            Modo: Bohr (Órbitas Estacionárias)
+                        </div>
+                    </div>
+
+                    <div class="w-full grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="setSimulationModel('bohr')" id="sim-btn-bohr"
+                            class="hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-circle-dot"></i> Bohr
+                        </button>
+                        <button onclick="setSimulationModel('schrodinger')" id="sim-btn-schrodinger"
+                            class="hex-clip-btn bg-hexDark border border-hexPurple text-hexPurple font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexPurple/20 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-cloud"></i> Schrödinger
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-hexGoldLight/60 text-center mt-3">
+                        * Alterne entre os botões para transformar as órbitas fixas de Bohr na nuvem probabilística de
+                        Schrödinger.
+                    </p>
+                </div>
+
+                <div class="hex-clip bg-hexPanel/90 border border-hexGold/30 p-5 relative">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <h3
+                        class="font-cinzel text-xs font-bold text-hexGold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-hexPurple"></i> Registro de Pesquisa
+                    </h3>
+                    <p id="terminalLog" class="text-xs text-hexGoldLight/80 font-mono leading-relaxed">
+                        > Sistema inicializado com sucesso.<br>
+                        > Selecione um módulo à esquerda para carregar a transição de Bohr para Schrödinger.<br>
+                        > Ready...
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer
+        class="border-t border-hexGold/30 bg-hexPanel/90 py-4 px-6 text-center text-xs text-hexGoldLight/60 mt-auto">
+        <p class="font-cinzel tracking-widest">ATOM &bull; HISTORICIDADE ATÔMICA &bull; 1913 - 1926</p>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-hexGold', 'bg-hexGold/10', 'shadow-lg');
+                btn.classList.add('border-hexGold/30', 'bg-hexPanel/80');
+            });
+
+            const targetContent = document.getElementById(`tab-content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-hexGold/30', 'bg-hexPanel/80');
+                targetBtn.classList.add('border-hexGold', 'bg-hexGold/20', 'shadow-lg');
+            }
+
+            const logs = {
+                overview: "> Módulo 01 carregado: Visão geral da transição das órbitas fixas para a nuvem quântica.",
+                bohr: "> Módulo 02 carregado: Niels Bohr e as órbitas estacionárias (1913).",
+                transition: "> Módulo 03 carregado: Dualidade onda-partícula e o Princípio da Incerteza.",
+                schrodinger: "> Módulo 04 carregado: Erwin Schrödinger e o Modelo Quântico-Ondulatório (1926).",
+                comparison: "> Módulo 05 carregado: Tabela comparativa e simulação interativa ativada."
+            };
+            document.getElementById('terminalLog').innerHTML = logs[tabId] || "> Dados atualizados.";
+
+            if (tabId === 'bohr') {
+                setSimulationModel('bohr');
+            } else if (tabId === 'schrodinger') {
+                setSimulationModel('schrodinger');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('overview');
+            initCanvasSimulation();
+        });
+
+        let currentSimModel = 'bohr';
+        let canvas, ctx;
+        let animationFrameId;
+        let bohrOrbits = [];
+        let cloudDots = [];
+
+        function initCanvasSimulation() {
+            canvas = document.getElementById('atomicCanvas');
+            ctx = canvas.getContext('2d');
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            bohrOrbits = [
+                { radius: 35, speed: 0.04, angle: 0 },
+                { radius: 65, speed: 0.025, angle: 2 },
+                { radius: 95, speed: 0.015, angle: 4 }
+            ];
+
+            for (let i = 0; i < 200; i++) {
+                let r = Math.random() * 80;
+                let theta = Math.random() * Math.PI * 2;
+                if (i % 2 === 0) {
+                    theta = (Math.random() > 0.5 ? 0 : Math.PI) + (Math.random() - 0.5) * 0.8;
+                }
+                cloudDots.push({
+                    r: r,
+                    theta: theta,
+                    baseSpeed: (Math.random() - 0.5) * 0.01
+                });
+            }
+
+            loop();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+        }
+
+        function setSimulationModel(model) {
+            currentSimModel = model;
+            const btnBohr = document.getElementById('sim-btn-bohr');
+            const btnSchrodinger = document.getElementById('sim-btn-schrodinger');
+            const overlay = document.getElementById('canvasOverlayText');
+
+            if (model === 'bohr') {
+                btnBohr.className = "hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5";
+                btnSchrodinger.className = "hex-clip-btn bg-hexDark border border-hexPurple text-hexPurple font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexPurple/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Bohr (Órbitas Estacionárias Fixas)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Bohr.";
+            } else {
+                btnSchrodinger.className = "hex-clip-btn bg-hexPurple text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexPurpleGlow flex items-center justify-center gap-1.5";
+                btnBohr.className = "hex-clip-btn bg-hexDark border border-hexGold text-hexGold font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexGold/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Schrödinger (Nuvem de Probabilidade / Orbital)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Schrödinger (Orbitais).";
+            }
+        }
+
+        function loop() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
+            const coreGrad = ctx.createRadialGradient(centerX - 2, centerY - 2, 2, centerX, centerY, 10);
+            coreGrad.addColorStop(0, '#c89b3c');
+            coreGrad.addColorStop(1, '#785a28');
+            ctx.fillStyle = coreGrad;
+            ctx.shadowColor = '#c89b3c';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.closePath();
+
+            if (currentSimModel === 'bohr') {
+                bohrOrbits.forEach((orbit, index) => {
+                    orbit.angle += orbit.speed;
+
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, orbit.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = index === 0 ? 'rgba(11, 198, 227, 0.4)' : index === 1 ? 'rgba(200, 155, 60, 0.4)' : 'rgba(168, 85, 247, 0.4)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.closePath();
+
+                    const ex = centerX + Math.cos(orbit.angle) * orbit.radius;
+                    const ey = centerY + Math.sin(orbit.angle) * orbit.radius;
+
+                    ctx.beginPath();
+                    ctx.arc(ex, ey, 4.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0bc6e3';
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                });
+
+            } else {
+                cloudDots.forEach(d => {
+                    d.theta += d.baseSpeed;
+                    const x = centerX + Math.cos(d.theta) * d.r;
+                    const y = centerY + Math.sin(d.theta) * (d.r * 0.7);
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(168, 85, 247, 0.7)';
+                    ctx.shadowColor = '#c084fc';
+                    ctx.shadowBlur = 6;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+                });
+
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, 80, 50, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(168, 85, 247, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+
+</html>
