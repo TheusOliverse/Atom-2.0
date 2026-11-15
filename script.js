@@ -368,9 +368,6 @@ function toggleInfoPanel() {
   card.style.display = (card.style.display === 'none') ? 'block' : 'none';
 }
 
-function closeWelcome() {
-  document.getElementById('welcome-screen').style.display = 'none';
-}
 
 function openWelcome() {
   document.getElementById('welcome-screen').style.display = 'flex';
@@ -508,4 +505,7 @@ function fechar_modal() {
 
 fechar_modal()
 
-closeWelcome()
+document.getElementById("close_welcome").addEventListener("click", () => {
+  document.getElementById("welcome-screen").style.display = 'none'
+})
+

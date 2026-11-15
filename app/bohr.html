@@ -409,62 +409,64 @@
 
         // --- Build Bohr Shells & Orbiting Electrons ---
         function updateBohrModel(totalElectrons) {
-            while (shellsGroup.children.length > 0) {
-                const obj = shellsGroup.children[0];
-                shellsGroup.remove(obj);
-            }
-            electronObjects = [];
+    while (shellsGroup.children.length > 0) {
+        const obj = shellsGroup.children[0];
+        shellsGroup.remove(obj);
+    }
+    electronObjects = [];
 
-            // Bohr Shell Capacities: K=2, L=8, M=8, N=2 (Total 20)
-            const shellCapacities = [2, 8, 8, 2];
-            const shellRadii = [3.2, 5.2, 7.2, 9.2];
-            const shellNames = ['K', 'L', 'M', 'N'];
+    // Capacidades das Camadas de Bohr: K=2, L=8, M=8, N=2 (Total 20)
+    const shellCapacities = [2, 8, 8, 2];
+    const shellRadii = [3.2, 5.2, 7.2, 9.2];
+    const shellNames = ['K', 'L', 'M', 'N'];
 
-            let remainingElectrons = totalElectrons;
-            let activeShellsStr = [];
+    let remainingElectrons = totalElectrons;
+    let activeShellsStr = [];
 
-            for (let s = 0; s < shellCapacities.length; s++) {
-                if (remainingElectrons <= 0) break;
-                const countInShell = Math.min(remainingElectrons, shellCapacities[s]);
-                remainingElectrons -= countInShell;
+    for (let s = 0; s < shellCapacities.length; s++) {
+        if (remainingElectrons <= 0) break;
+        const countInShell = Math.min(remainingElectrons, shellCapacities[s]);
+        remainingElectrons -= countInShell;
 
-                activeShellsStr.push(`${shellNames[s]}(${countInShell})`);
+        activeShellsStr.push(`${shellNames[s]}(${countInShell})`);
 
-                // Create Orbit Ring (Visual guideline)
-                const ringGeo = new THREE.RingGeometry(shellRadii[s] - 0.03, shellRadii[s] + 0.03, 64);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: 0x0ea5e9,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.25
-                });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.rotation.x = Math.PI / 2;
-                // Tilt shells slightly for 3D depth aesthetic
-                ring.rotation.z = s * 0.35;
-                shellsGroup.add(ring);
+        // Criar o Anel Orbital (Guia visual)
+        const ringGeo = new THREE.RingGeometry(shellRadii[s] - 0.03, shellRadii[s] + 0.03, 64);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: 0x0ea5e9,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.25
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        
+        // Definição das rotações do anel
+        ring.rotation.x = Math.PI / 2;
+        ring.rotation.z = s * 0.35;
+        shellsGroup.add(ring);
 
-                // Place Electrons on this Shell Ring
-                for (let e = 0; e < countInShell; e++) {
-                    const angle = (e / countInShell) * Math.PI * 2;
-                    const electronMesh = new THREE.Mesh(electronGeo, electronMat);
-                    
-                    // Store orbital kinematic parameters
-                    electronMesh.userData = {
-                        radius: shellRadii[s],
-                        angle: angle,
-                        speed: (2.5 / (s + 1.5)) * (Math.random() > 0.5 ? 1 : -1),
-                        tiltX: ring.rotation.x,
-                        tiltZ: ring.rotation.z
-                    };
+        // Posicionar os elétrons como filhos diretos do anel (herdam a rotação perfeitamente)
+        for (let e = 0; e < countInShell; e++) {
+            const angle = (e / countInShell) * Math.PI * 2;
+            const electronMesh = new THREE.Mesh(electronGeo, electronMat);
+            
+            // Posição inicial no plano local do anel
+            electronMesh.position.set(Math.cos(angle) * shellRadii[s], Math.sin(angle) * shellRadii[s], 0);
 
-                    shellsGroup.add(electronMesh);
-                    electronObjects.push(electronMesh);
-                }
-            }
+            // Parâmetros cinemáticos orbitais
+            electronMesh.userData = {
+                radius: shellRadii[s],
+                angle: angle,
+                speed: (2.5 / (s + 1.5)) * (Math.random() > 0.5 ? 1 : -1)
+            };
 
-            document.getElementById('shells-status').innerText = activeShellsStr.join(', ') || 'Nenhuma';
+            ring.add(electronMesh);
+            electronObjects.push(electronMesh);
         }
+    }
+
+    document.getElementById('shells-status').innerText = activeShellsStr.join(', ') || 'Nenhuma';
+}
 
         // --- Physics Stability & Radiation Calculation ---
         function checkStability() {
@@ -587,21 +589,13 @@
 
             // Animate Bohr Electrons revolving around circular orbits
             electronObjects.forEach(el => {
-                el.userData.angle += el.userData.speed * 0.015;
-                const r = el.userData.radius;
-                const a = el.userData.angle;
-
-                // Calculate position on inclined circular path
-                const x = Math.cos(a) * r;
-                const z = Math.sin(a) * r;
-                
-                // Apply orbital tilt
-                const y = z * Math.sin(el.userData.tiltZ);
-                const finalX = x * Math.cos(el.userData.tiltZ) - z * Math.sin(el.userData.tiltZ);
-                const finalZ = x * Math.sin(el.userData.tiltZ) + z * Math.cos(el.userData.tiltZ);
-
-                el.position.set(finalX, y, finalZ);
-            });
+    el.userData.angle += el.userData.speed * 0.015;
+    const r = el.userData.radius;
+    const a = el.userData.angle;
+    
+    // Atualiza a posição estritamente no plano XY do anel pai
+    el.position.set(Math.cos(a) * r, Math.sin(a) * r, 0);
+});
 
             updateScintillometer(time);
             controls.update();
