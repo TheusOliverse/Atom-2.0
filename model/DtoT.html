@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom | Dalton &rarr; Thomson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        hexDark: '#070a10',
+                        hexPanel: '#0a101d',
+                        hexBorder: '#1e293b',
+                        hexGold: '#c89b3c',
+                        hexGoldLight: '#f0e6d2',
+                        hexGoldDark: '#785a28',
+                        hexBlue: '#0bc6e3',
+                        hexBlueGlow: '#00f2ff',
+                        hexRed: '#f04242',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cinzel: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hex-clip {
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+        .hex-clip-btn {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .hex-corner-tl {
+            position: absolute;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            border-top: 2px solid #c89b3c;
+            border-left: 2px solid #c89b3c;
+        }
+        .hex-corner-br {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 8px; height: 8px;
+            border-bottom: 2px solid #c89b3c;
+            border-right: 2px solid #c89b3c;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c89b3c;
+            border-radius: 3px;
+        }
+        .hex-glow {
+            box-shadow: 0 0 20px rgba(12, 198, 227, 0.15), inset 0 0 15px rgba(200, 155, 60, 0.1);
+        }
+        .hex-gold-glow {
+            text-shadow: 0 0 10px rgba(200, 155, 60, 0.6);
+        }
+        .hex-blue-glow {
+            text-shadow: 0 0 10px rgba(11, 198, 227, 0.6);
+        }
+        .hex-grid-bg {
+            background-image: linear-gradient(rgba(200, 155, 60, 0.03) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(200, 155, 60, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-hexDark text-hexGoldLight font-sans min-h-screen hex-grid-bg flex flex-col relative overflow-x-hidden selection:bg-hexGold selection:text-hexDark">
+
+    <header class="border-b border-hexGold/30 bg-hexPanel/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-12 py-3 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 hex-clip bg-gradient-to-br from-hexGold to-hexGoldDark flex items-center justify-center border border-hexGold/60 shadow-lg">
+                <i class="fa-solid fa-atom text-hexDark text-lg animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+                <h1 class="font-cinzel font-black tracking-widest text-lg lg:text-xl text-hexGold hex-gold-glow uppercase">Atom // Linha Temporal</h1>
+                <p class="text-xs text-hexBlue tracking-wider">Módulos de Pesquisa Atômica: Dalton &rarr; Thomson</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-3 bg-hexDark/80 border border-hexGold/30 px-4 py-1.5 hex-clip">
+            <span class="w-2 h-2 rounded-full bg-hexBlue animate-ping"></span>
+            <span class="text-xs tracking-widest uppercase text-hexGoldLight">Status: Conexão Estável com o Núcleo</span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 flex flex-col gap-8">
+
+        <nav class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" aria-label="Abas de Navegação">
+            <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/60 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 01</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Visão Geral</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+            
+            <button onclick="switchTab('dalton')" id="btn-dalton" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 02</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo Dalton</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('transition')" id="btn-transition" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 03</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">A Transição</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('thomson')" id="btn-thomson" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 04</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Modelo Thomson</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+
+            <button onclick="switchTab('comparison')" id="btn-comparison" class="tab-btn hex-clip-btn bg-hexPanel/80 border border-hexGold/30 px-4 py-3 text-left transition-all duration-300 hover:bg-hexGold/20 group relative overflow-hidden col-span-2 sm:col-span-1">
+                <div class="absolute inset-0 bg-gradient-to-r from-hexGold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <span class="block text-[10px] tracking-widest text-hexGold font-bold">MÓDULO 05</span>
+                <span class="font-cinzel text-xs lg:text-sm font-bold text-hexGoldLight group-hover:text-hexBlue transition-colors">Comparativo & Simulação</span>
+                <div class="hex-corner-tl"></div>
+                <div class="hex-corner-br"></div>
+            </button>
+        </nav>
+
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+
+                <div id="tab-content-overview" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scroll text-hexGold text-2xl"></i>
+                        <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">A Jornada Científica do Átomo</h2>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            A busca para entender a estrutura fundamental da matéria é uma das maiores odisseias da história humana e da revolução científica. Da antiga intuição filosófica dos gregos (Leucipo e Demócrito cunhando o termo <em>atomos</em>, significando "indivisível") até a rigorosa experimentação quantitativa dos séculos XIX e XX, a humanidade desbravou o desconhecido.
+                        </p>
+                        <p>
+                            Neste módulo dos Arquivos Hextech, exploramos o salto científico que levou da rígida e solitária <strong>Esfera de Bilhar de John Dalton (1808)</strong> ao revolucionário <strong>Pudim de Passas de J.J. Thomson (1897)</strong>, que pela primeira vez abriu a "caixa preta" do átomo ao descobrir partículas subatômicas: os elétrons.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                            <div class="p-4 bg-hexDark/60 border border-hexGold/30 hex-clip">
+                                <h3 class="font-cinzel text-hexGold font-bold mb-1">1808 - John Dalton</h3>
+                                <p class="text-xs text-hexGoldLight/70">O átomo como uma esfera maciça, neutra e indivisível, elemento fundamental de cada elemento químico.</p>
+                            </div>
+                            <div class="p-4 bg-hexDark/60 border border-hexBlue/30 hex-clip">
+                                <h3 class="font-cinzel text-hexBlue font-bold mb-1">1897 - J.J. Thomson</h3>
+                                <p class="text-xs text-hexGoldLight/70">Descoberta do elétron e a queda da indivisibilidade; nasce o modelo de carga difusa com corpúsculos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-dalton" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-circle text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de John Dalton (1808)</h2>
+                            <p class="text-xs text-hexBlue">A "Bola de Bilhar"</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            O meteorologista e químico britânico John Dalton resgatou a ideia atomista dando-lhe base empírica fundamentada nas Leis Ponderais das reações químicas (Lei de Lavoisier e Lei de Proust). Seu modelo concebia o átomo com as seguintes premissas fundamentais:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexGold/50">
+                            <li><strong class="text-hexGold">1. Indivisibilidade:</strong> Toda a matéria é composta por partículas minúsculas, maciças e indivisíveis chamadas átomos.</li>
+                            <li><strong class="text-hexGold">2. Identidade dos Elementos:</strong> Átomos de um mesmo elemento químico são idênticos em massa, tamanho e propriedades. Átomos de elementos diferentes possuem massas e propriedades distintas.</li>
+                            <li><strong class="text-hexGold">3. Conservação:</strong> As reações químicas consistem apenas na recombinação, separação ou arranjo de átomos; eles não são criados nem destruídos.</li>
+                            <li><strong class="text-hexGold">4. Proporções Fixas:</strong> Compostos químicos são formados pela união de átomos de elementos diferentes em proporções numéricas inteiras e fixas.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexGold/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexGold uppercase block mb-1">Acertos & Limitações Históricas:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                <strong>Acerto:</strong> Explicou com sucesso as leis ponderais das reações químicas. <br>
+                                <strong>Limitação:</strong> Não explicava fenômenos elétricos, radioativos ou a existência de isótopos e partículas subatômicas. O átomo não era uma "esfera perfeita e maciça".
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-transition" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-bolt text-hexBlue text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">A Transição & Experiências Críticas</h2>
+                            <p class="text-xs text-hexBlue">Quebrando o Dogma da Indivisibilidade</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Durante todo o século XIX, o modelo de Dalton reinou supremo. No entanto, experimentos com eletricidade em tubos de vidro rarefeito (os chamados <strong>Tubos de Crookes</strong>) começaram a desafiar a ideia de que o átomo era a menor unidade irredutível da matéria.
+                        </p>
+                        <div class="p-4 bg-hexDark/90 border border-hexBlue/50 hex-clip my-4">
+                            <h3 class="font-cinzel text-hexBlue font-bold text-sm mb-2"><i class="fa-solid fa-flask mr-2"></i>O Experimento dos Raios Catódicos (1897)</h3>
+                            <p class="text-xs text-hexGoldLight/80 leading-relaxed">
+                                J.J. Thomson aplicou alta voltagem em um tubo de gás a baixa pressão. Ele observou um feixe luminoso (raios catódicos) que se deslocava do cátodo para o ânodo. Ao aplicar campos elétricos e magnéticos, o feixe sofria desvio em direção à placa positiva. Isso provou inequivocamente que os raios consistiam em <strong>partículas corpúsculas carregadas negativamente</strong> — os elétrons.
+                            </p>
+                        </div>
+                        <p>
+                            Como a matéria é eletricamente neutra no estado natural, se o átomo continha cargas negativas (elétrons), ele necessariamente precisava conter também uma contrapartida de <strong>carga positiva</strong> para equilibrar o sistema. Isso destruiu o conceito daltoniano de esfera neutra e indivisível.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="tab-content-thomson" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-pie-chart text-hexBlue text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">O Modelo de J.J. Thomson (1897)</h2>
+                            <p class="text-xs text-hexBlue">O "Pudim de Passas" (Plum Pudding Model)</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-hexGoldLight/90 text-sm lg:text-base leading-relaxed">
+                        <p>
+                            Com a descoberta do elétron, J.J. Thomson propôs o primeiro modelo atômico subatômico. Conhecido popularmente na cultura anglo-saxônica como <em>Plum Pudding</em> (e adaptado no Brasil como o famoso <strong>Pudim de Passas</strong>), o modelo definia:
+                        </p>
+                        <ul class="space-y-2 pl-4 border-l-2 border-hexBlue/50">
+                            <li><strong class="text-hexBlue">1. Esfera de Carga Positiva:</strong> O átomo consistia em uma esfera contínua e homogênea de eletricidade positiva que ocupava todo o volume do átomo.</li>
+                            <li><strong class="text-hexBlue">2. Elétrons Incrustados:</strong> Corpúsculos carregados negativamente (os elétrons) estavam espalhados e incrustados no interior dessa esfera positiva, como passas em um pudim ou sementes em uma melancia.</li>
+                            <li><strong class="text-hexBlue">3. Neutralidade Elétrica:</strong> A carga total positiva da esfera equilibrava exatamente a carga negativa combinada de todos os elétrons presentes.</li>
+                        </ul>
+                        <div class="p-4 bg-hexDark/80 border border-hexBlue/30 mt-4 hex-clip">
+                            <span class="text-xs font-bold text-hexBlue uppercase block mb-1">Acertos & Limitações Históricas:</span>
+                            <p class="text-xs text-hexGoldLight/80">
+                                <strong>Acerto:</strong> Introduziu a natureza elétrica e subatômica do átomo, prevendo a existência de cargas negativas e positivas. <br>
+                                <strong>Limitação:</strong> Foi desmentido anos mais tarde pelo experimento de espalhamento de partículas alfa de Rutherford (1911), que provou que o átomo é predominantemente espaço vazio com um núcleo denso e minúsculo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-comparison" class="tab-content hex-clip bg-hexPanel/90 border border-hexGold/40 p-6 lg:p-8 relative hex-glow hidden">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <div class="flex items-center space-x-3 mb-6 border-b border-hexGold/20 pb-4">
+                        <i class="fa-solid fa-scale-balanced text-hexGold text-2xl"></i>
+                        <div>
+                            <h2 class="font-cinzel text-xl lg:text-2xl font-bold text-hexGold">Comparativo Direto: Dalton vs. Thomson</h2>
+                            <p class="text-xs text-hexBlue">O Salto Conceitual</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs lg:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-hexGold/40 bg-hexDark/60 text-hexGold font-cinzel">
+                                    <th class="p-3">Critério Analítico</th>
+                                    <th class="p-3 text-hexGold">Modelo de Dalton (1808)</th>
+                                    <th class="p-3 text-hexBlue">Modelo de Thomson (1897)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-hexBorder text-hexGoldLight/90">
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Natureza do Átomo</td>
+                                    <td class="p-3">Esfera rígida, maciça e totalmente indivisível.</td>
+                                    <td class="p-3">Esfera divisível composta por massa gelatinosa de carga positiva.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Partículas Subatômicas</td>
+                                    <td class="p-3 text-hexRed/80">Nenhuma (o átomo era o limite absoluto).</td>
+                                    <td class="p-3 text-hexBlue">Possui elétrons (corpúsculos negativos) incrustados.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Propriedades Elétricas</td>
+                                    <td class="p-3">Neutra por inércia estrutural (sem cargas internas).</td>
+                                    <td class="p-3">Neutra por equilíbrio dinâmico (positivo difuso + negativo pontual).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Analogia Popular</td>
+                                    <td class="p-3">Bola de bilhar / esfera de chumbo sólida.</td>
+                                    <td class="p-3">Pudim de passas / melancia com sementes.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-hexGold">Principal Falha / Superação</td>
+                                    <td class="p-3">Ignorava a eletricidade e radiação; átomo não é indivisível.</td>
+                                    <td class="p-3">Incompatível com o espalhamento alfa de Rutherford (núcleo concentrado).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+                
+                <div class="hex-clip bg-hexPanel/95 border border-hexGold/60 p-5 relative hex-glow flex flex-col items-center">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    
+                    <div class="w-full flex items-center justify-between mb-3 border-b border-hexGold/30 pb-2">
+                        <span class="font-cinzel text-xs font-bold tracking-wider text-hexGold flex items-center gap-2">
+                            <i class="fa-solid fa-cube text-hexBlue"></i> Simulador Arcano H-01
+                        </span>
+                        <span class="text-[10px] bg-hexBlue/20 text-hexBlue px-2 py-0.5 border border-hexBlue/40 hex-clip">Holograma Ativo</span>
+                    </div>
+
+                    <div class="w-full h-64 bg-hexDark border border-hexGold/30 rounded relative overflow-hidden flex items-center justify-center shadow-inner my-2">
+                        <canvas id="atomicCanvas" class="w-full h-full cursor-pointer"></canvas>
+                        <div id="canvasOverlayText" class="absolute bottom-2 left-2 text-[10px] tracking-widest text-hexGold bg-hexDark/80 px-2 py-1 border border-hexGold/30 hex-clip">
+                            Modo: Esfera de Dalton (Maciça)
+                        </div>
+                    </div>
+
+                    <div class="w-full grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="setSimulationModel('dalton')" id="sim-btn-dalton" class="hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-circle">></i> Dalton
+                        </button>
+                        <button onclick="setSimulationModel('thomson')" id="sim-btn-thomson" class="hex-clip-btn bg-hexDark border border-hexBlue text-hexBlue font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexBlue/20 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-atom"></i> Thomson
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-hexGoldLight/60 text-center mt-3">
+                        * Clique alternando os botões acima para injetar a simulação visual do respectivo modelo atômico no núcleo quântico.
+                    </p>
+                </div>
+
+                <div class="hex-clip bg-hexPanel/90 border border-hexGold/30 p-5 relative">
+                    <div class="hex-corner-tl"></div>
+                    <div class="hex-corner-br"></div>
+                    <h3 class="font-cinzel text-xs font-bold text-hexGold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-hexBlue"></i> Registro de Pesquisa
+                    </h3>
+                    <p id="terminalLog" class="text-xs text-hexGoldLight/80 font-mono leading-relaxed">
+                        > Sistema inicializado com sucesso.<br>
+                        > Selecione um módulo à esquerda para carregar os postulados e comparar a evolução atômica.<br>
+                        > Ready...
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="border-t border-hexGold/30 bg-hexPanel/90 py-4 px-6 text-center text-xs text-hexGoldLight/60 mt-auto">
+        <p class="font-cinzel tracking-widest">ATOM &bull; HISTORICIDADE ATÔMICA &bull; 1808 - 1897</p>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-hexGold', 'bg-hexGold/10', 'shadow-lg');
+                btn.classList.add('border-hexGold/30', 'bg-hexPanel/80');
+            });
+            const targetContent = document.getElementById(`tab-content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
+            const targetBtn = document.getElementById(`btn-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-hexGold/30', 'bg-hexPanel/80');
+                targetBtn.classList.add('border-hexGold', 'bg-hexGold/20', 'shadow-lg');
+            }
+
+            const logs = {
+                overview: "> Módulo 01 carregado: Visão geral da jornada científica atômica.",
+                dalton: "> Módulo 02 carregado: John Dalton e a rigidez da Esfera Indivisível (1808).",
+                transition: "> Módulo 03 carregado: Experimentos de Raios Catódicos e a queda da indivisibilidade.",
+                thomson: "> Módulo 04 carregado: J.J. Thomson e o modelo do Pudim de Passas (1897).",
+                comparison: "> Módulo 05 carregado: Tabela comparativa e simulação interativa ativada."
+            };
+            document.getElementById('terminalLog').innerHTML = logs[tabId] || "> Dados atualizados.";
+            if (tabId === 'dalton') {
+                setSimulationModel('dalton');
+            } else if (tabId === 'thomson') {
+                setSimulationModel('thomson');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('overview');
+            initCanvasSimulation();
+        });
+
+        let currentSimModel = 'dalton';
+        let canvas, ctx;
+        let animationFrameId;
+        let particles = [];
+
+        function initCanvasSimulation() {
+            canvas = document.getElementById('atomicCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    angle: Math.random() * Math.PI * 2,
+                    distance: Math.random() * 60 + 10,
+                    speed: (Math.random() - 0.5) * 0.03,
+                    radius: 5
+                });
+            }
+
+            loop();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+        }
+
+        function setSimulationModel(model) {
+            currentSimModel = model;
+            const btnDalton = document.getElementById('sim-btn-dalton');
+            const btnThomson = document.getElementById('sim-btn-thomson');
+            const overlay = document.getElementById('canvasOverlayText');
+
+            if (model === 'dalton') {
+                btnDalton.className = "hex-clip-btn bg-hexGold text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexGoldLight flex items-center justify-center gap-1.5";
+                btnThomson.className = "hex-clip-btn bg-hexDark border border-hexBlue text-hexBlue font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexBlue/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Esfera de Dalton (Maciça & Neutra)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Dalton (Bola de Bilhar).";
+            } else {
+                btnThomson.className = "hex-clip-btn bg-hexBlue text-hexDark font-bold py-2 px-3 text-xs tracking-wider transition-all shadow hover:bg-hexBlueGlow flex items-center justify-center gap-1.5";
+                btnDalton.className = "hex-clip-btn bg-hexDark border border-hexGold text-hexGold font-bold py-2 px-3 text-xs tracking-wider transition-all hover:bg-hexGold/20 flex items-center justify-center gap-1.5";
+                overlay.innerText = "Modo: Thomson (Carga Positiva + Elétrons)";
+                document.getElementById('terminalLog').innerHTML = "> Simulação alterada para: Modelo de Thomson (Pudim de Passas).";
+            }
+        }
+
+        function loop() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 70;
+
+            if (currentSimModel === 'dalton') {
+                const gradient = ctx.createRadialGradient(centerX - 20, centerY - 20, 10, centerX, centerY, radius);
+                gradient.addColorStop(0, '#f0e6d2');
+                gradient.addColorStop(0.5, '#c89b3c');
+                gradient.addColorStop(1, '#785a28');
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#f0e6d2';
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius + 4, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(200, 155, 60, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.fillStyle = '#070a10';
+                ctx.font = 'bold 11px Cinzel, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('DALTON', centerX, centerY + 4);
+
+            } else {
+                const jellyGrad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, radius);
+                jellyGrad.addColorStop(0, 'rgba(240, 66, 66, 0.25)');
+                jellyGrad.addColorStop(1, 'rgba(240, 66, 66, 0.05)');
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = jellyGrad;
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#f04242';
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.closePath();
+
+                ctx.fillStyle = 'rgba(240, 66, 66, 0.6)';
+                ctx.font = 'bold 16px Cinzel, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('(+) CAMPO POSITIVO', centerX, centerY - 10);
+
+                particles.forEach(p => {
+                    p.angle += p.speed;
+                    const x = centerX + Math.cos(p.angle) * p.distance;
+                    const y = centerY + Math.sin(p.angle) * p.distance + 15;
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#0bc6e3';
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.closePath();
+
+                    ctx.fillStyle = '#070a10';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('-', x, y + 3);
+                });
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>

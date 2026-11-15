@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Átomo de Schrödinger</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0b192c',
+                            900: '#070f1e',
+                            950: '#030712',
+                        },
+                        azure: {
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                        },
+                        cobalt: {
+                            500: '#1d4ed8',
+                            600: '#1e40af',
+                            700: '#1d3557',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Three.js & OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- FontAwesome for Radiation & Tech Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(11, 25, 44, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 10, 30, 0.5);
+        }
+        .radiation-pulse {
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 2px #0ea5e9); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 12px #38bdf8); transform: scale(1.05); }
+        }
+        .radiation-warning {
+            animation: danger-pulse 0.6s infinite alternate;
+        }
+        @keyframes danger-pulse {
+            0% { filter: drop-shadow(0 0 5px #ef4444); color: #ef4444; }
+            100% { filter: drop-shadow(0 0 20px #dc2626); color: #f87171; }
+        }
+        /* Custom Scrollbar for side panel */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(3, 7, 18, 0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+    </style>
+</head>
+<body class="h-full w-full relative">
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container" class="absolute inset-0 z-0"></div>
+
+    <!-- Main UI Overlay -->
+    <div class="absolute inset-0 z-10 flex flex-col pointer-events-none p-4 md:p-6 justify-between">
+        
+        <!-- Top Bar Header & Cintilômetro Gauge -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 w-full">
+            
+            <!-- Title & Element Indicator -->
+            <div class="glass-panel p-4 rounded-xl pointer-events-auto flex items-center gap-4 border-l-4 border-l-azure-500 w-full md:w-auto">
+                <div class="relative">
+                    <i id="rad-icon" class="fa-solid fa-radiation text-3xl text-azure-400 radiation-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wider text-azure-400 uppercase">Modelo de Schrödinger</h1>
+                    <div class="flex items-center gap-2">
+                        <span id="element-symbol" class="text-2xl font-black text-white">H</span>
+                        <span id="element-name" class="text-xs text-sky-200 font-medium tracking-wide uppercase">Hidrogênio-1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cintilômetro Dashboard (Scintillometer Gauge) -->
+            <div class="glass-panel p-4 rounded-xl pointer-events-auto flex items-center gap-6 border-r-4 border-r-azure-500 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-azure-400">Cintilômetro (Detector CPS)</span>
+                    <div class="flex items-baseline gap-1">
+                        <span id="cps-value" class="text-2xl font-mono font-bold text-sky-300">0</span>
+                        <span class="text-xs text-slate-400">CPS</span>
+                    </div>
+                    <span id="cpm-value" class="text-[11px] font-mono text-slate-400">0 CPM</span>
+                </div>
+                
+                <!-- Analog Needle Gauge Visualizer -->
+                <div class="relative w-24 h-12 bg-slate-900/80 rounded-t-full border border-sky-500/30 overflow-hidden flex items-end justify-center">
+                    <div class="absolute inset-0 flex justify-between px-2 pt-2 text-[8px] font-mono text-slate-500">
+                        <span>0</span>
+                        <span>50k</span>
+                    </div>
+                    <div id="gauge-needle" class="w-0.5 h-10 bg-azure-400 origin-bottom transform -rotate-90 transition-transform duration-100 ease-out shadow-[0_0_8px_#38bdf8]"></div>
+                    <div class="w-3 h-3 bg-azure-500 rounded-full z-10 -mb-1.5 shadow-md"></div>
+                </div>
+
+                <!-- Audio Toggle -->
+                <button id="audio-toggle" class="p-2.5 rounded-lg bg-azure-950/60 hover:bg-azure-900/80 border border-azure-500/30 text-azure-400 transition">
+                    <i id="audio-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Instability Alert Banner Overlay -->
+        <div id="alert-banner" class="hidden pointer-events-auto self-center glass-panel border-red-500/80 bg-red-950/40 text-red-400 px-6 py-3 rounded-xl flex items-center gap-3 animate-bounce shadow-[0_0_30px_rgba(239,68,68,0.4)]">
+            <i class="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
+            <div>
+                <h3 class="font-bold text-sm tracking-wider uppercase text-red-200">ALERTA DE DESESTABILIDADE!</h3>
+                <p id="alert-reason" class="text-xs text-red-300">Núcleo altamente instável ou excesso de partículas.</p>
+            </div>
+        </div>
+
+        <!-- Bottom Desktop / Floating Particle Controls -->
+        <div class="glass-panel p-4 md:p-5 rounded-2xl pointer-events-auto w-full max-w-xl self-center border-t-2 border-t-azure-400/50">
+            <div class="grid grid-cols-3 gap-3 md:gap-6 text-center">
+                
+                <!-- Protons Control -->
+                <div class="flex flex-col items-center gap-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-300">Prótons (Z)</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="adjustParticle('protons', -1)" class="w-8 h-8 rounded-lg bg-azure-950 border border-azure-500/40 text-azure-300 hover:bg-azure-800 active:scale-95 transition flex items-center justify-center font-bold">-</button>
+                        <span id="proton-count" class="w-7 text-lg font-mono font-bold text-white">1</span>
+                        <button onclick="adjustParticle('protons', 1)" class="w-8 h-8 rounded-lg bg-azure-950 border border-azure-500/40 text-azure-300 hover:bg-azure-800 active:scale-95 transition flex items-center justify-center font-bold">+</button>
+                    </div>
+                </div>
+
+                <!-- Neutrons Control -->
+                <div class="flex flex-col items-center gap-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">Nêutrons (N)</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="adjustParticle('neutrons', -1)" class="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-800 active:scale-95 transition flex items-center justify-center font-bold">-</button>
+                        <span id="neutron-count" class="w-7 text-lg font-mono font-bold text-white">0</span>
+                        <button onclick="adjustParticle('neutrons', 1)" class="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-800 active:scale-95 transition flex items-center justify-center font-bold">+</button>
+                    </div>
+                </div>
+
+                <!-- Electrons Control -->
+                <div class="flex flex-col items-center gap-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-300">Eletrons (e⁻)</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="adjustParticle('electrons', -1)" class="w-8 h-8 rounded-lg bg-blue-950 border border-blue-500/40 text-blue-300 hover:bg-blue-800 active:scale-95 transition flex items-center justify-center font-bold">-</button>
+                        <span id="electron-count" class="w-7 text-lg font-mono font-bold text-white">1</span>
+                        <button onclick="adjustParticle('electrons', 1)" class="w-8 h-8 rounded-lg bg-blue-950 border border-blue-500/40 text-blue-300 hover:bg-blue-800 active:scale-95 transition flex items-center justify-center font-bold">+</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quantum Orbital Status -->
+            <div class="mt-4 pt-3 border-t border-sky-500/20 flex justify-between items-center text-[11px] text-slate-400 font-mono">
+                <div>Orbital Ativo: <span id="orbital-name" class="text-azure-300 font-bold">1s</span></div>
+                <div>Status: <span id="stability-status" class="text-emerald-400 font-bold">ESTÁVEL</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Instability Alert Modal -->
+    <div id="instability-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="glass-panel border-2 border-red-500/80 p-6 md:p-8 rounded-2xl max-w-md w-full text-center shadow-[0_0_50px_rgba(239,68,68,0.3)]">
+            <div class="w-16 h-16 rounded-full bg-red-950/80 border border-red-500 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-radiation text-3xl text-red-500 radiation-warning"></i>
+            </div>
+            <h2 class="text-xl font-bold text-red-400 tracking-wider uppercase mb-2">DESESTABILIDADE NUCLEAR!</h2>
+            <p id="modal-desc" class="text-sm text-slate-300 mb-6">A proporção de partículas superou o limite de estabilidade física. O átomo entrou em estado colapsado ou decaimento radiativo severo.</p>
+            <button onclick="closeModal()" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold tracking-wider transition uppercase shadow-lg shadow-red-600/30">Ajustar Partículas</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Web Audio API Geiger & Alarm Synthesizer ---
+        let audioCtx = null;
+        let audioMuted = false;
+        let alarmOscillator = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playGeigerClick() {
+            if (audioMuted || !audioCtx) return;
+            try {
+                const bufferSize = audioCtx.sampleRate * 0.002;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 1000;
+                noise.connect(filter);
+                filter.connect(audioCtx.destination);
+                noise.start();
+            } catch (e) {}
+        }
+
+        function triggerAlarmSound(enable) {
+            if (!audioCtx || audioMuted) return;
+            if (enable) {
+                if (!alarmOscillator) {
+                    try {
+                        alarmOscillator = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        alarmOscillator.type = 'sawtooth';
+                        alarmOscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+                        alarmOscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+                        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                        alarmOscillator.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        alarmOscillator.start();
+                    } catch (e) {}
+                }
+            } else {
+                if (alarmOscillator) {
+                    try {
+                        alarmOscillator.stop();
+                        alarmOscillator.disconnect();
+                    } catch (e) {}
+                    alarmOscillator = null;
+                }
+            }
+        }
+
+        document.getElementById('audio-toggle').addEventListener('click', () => {
+            initAudio();
+            audioMuted = !audioMuted;
+            const icon = document.getElementById('audio-icon');
+            icon.className = audioMuted ? 'fa-solid fa-volume-xmark text-slate-500' : 'fa-solid fa-volume-high text-azure-400';
+            if (audioMuted && alarmOscillator) triggerAlarmSound(false);
+        });
+
+        // --- Element Database ---
+        const elementsDB = [
+            { z: 1, name: "Hidrogênio", symbol: "H" },
+            { z: 2, name: "Hélio", symbol: "He" },
+            { z: 3, name: "Lítio", symbol: "Li" },
+            { z: 4, name: "Berílio", symbol: "Be" },
+            { z: 5, name: "Boro", symbol: "B" },
+            { z: 6, name: "Carbono", symbol: "C" },
+            { z: 7, name: "Nitrogênio", symbol: "N" },
+            { z: 8, name: "Oxigênio", symbol: "O" },
+            { z: 9, name: "Flúor", symbol: "F" },
+            { z: 10, name: "Neônio", symbol: "Ne" },
+            { z: 11, name: "Sódio", symbol: "Na font-bold" },
+            { z: 12, name: "Magnésio", symbol: "Mg" },
+            { z: 13, name: "Alumínio", symbol: "Al" },
+            { z: 14, name: "Silício", symbol: "Si" },
+            { z: 15, name: "Fósforo", symbol: "P" },
+            { z: 16, name: "Enxofre", symbol: "S" },
+            { z: 17, name: "Cloro", symbol: "Cl" },
+            { z: 18, name: "Argônio", symbol: "Ar" },
+            { z: 19, name: "Potássio", symbol: "K" },
+            { z: 20, name: "Cálcio", symbol: "Ca" }
+        ];
+
+        // Particle State
+        let protons = 1;
+        let neutrons = 0;
+        let electrons = 1;
+        const MAX_LIMIT = 20;
+
+        let isInstable = false;
+        let cpsRate = 0;
+
+        // --- Three.js Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030712, 0.035);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 4, 14);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.rotateSpeed = 0.8;
+        controls.maxDistance = 30;
+        controls.minDistance = 3;
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x0284c7, 0.8);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x38bdf8, 2, 50);
+        pointLight.position.set(0, 0, 0);
+        scene.add(pointLight);
+
+        const dirLight = new THREE.DirectionalLight(0x93c5fd, 1.2);
+        dirLight.position.set(10, 15, 10);
+        scene.add(dirLight);
+
+        // --- 3D Groups ---
+        const nucleusGroup = new THREE.Group();
+        scene.add(nucleusGroup);
+
+        let electronCloudPoints = null;
+
+        // Spheres Geometries for Nucleons
+        const protonGeo = new THREE.SphereGeometry(0.32, 16, 16);
+        const neutronGeo = new THREE.SphereGeometry(0.32, 16, 16);
+
+        const protonMat = new THREE.MeshPhongMaterial({
+            color: 0x0284c7,
+            emissive: 0x0369a1,
+            specular: 0x38bdf8,
+            shininess: 60
+        });
+
+        const neutronMat = new THREE.MeshPhongMaterial({
+            color: 0x1e3a8a,
+            emissive: 0x172554,
+            specular: 0x60a5fa,
+            shininess: 30
+        });
+
+        // --- Schrödinger Wavefunction Probability Cloud Generation ---
+        function generateSchrodingerCloud(totalElectrons) {
+            if (electronCloudPoints) {
+                scene.remove(electronCloudPoints);
+                electronCloudPoints.geometry.dispose();
+                electronCloudPoints.material.dispose();
+                electronCloudPoints = null;
+            }
+
+            const count = Math.min(totalElectrons * 2500, 45000);
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+
+            let subshellIndex = 0;
+            // Electron configuration capacity: 1s(2), 2s(2), 2p(6), 3s(2), 3p(6), 4s(2)
+            const subshells = [
+                { type: 's', n: 1, cap: 2, scale: 2.2 },
+                { type: 's', n: 2, cap: 2, scale: 3.8 },
+                { type: 'p', n: 2, cap: 6, scale: 5.2 },
+                { type: 's', n: 3, cap: 2, scale: 6.8 },
+                { type: 'p', n: 3, cap: 6, scale: 8.5 },
+                { type: 's', n: 4, cap: 2, scale: 10.0 }
+            ];
+
+            let assigned = 0;
+            let currentSubIndex = 0;
+
+            for (let i = 0; i < count; i++) {
+                if (assigned >= subshells[currentSubIndex].cap && currentSubIndex < subshells.length - 1) {
+                    assigned = 0;
+                    currentSubIndex++;
+                }
+                assigned += subshells[currentSubIndex].cap / (count / totalElectrons);
+
+                const sub = subshells[currentSubIndex];
+                let x = 0, y = 0, z = 0;
+
+                if (sub.type === 's') {
+                    // Spherical probability distribution |Ψ_100|^2 ~ exp(-2r/a0)
+                    const u = Math.random();
+                    const r = -Math.log(1 - u) * sub.scale * 0.5 + (sub.n > 1 ? sub.scale * 0.4 : 0.4);
+                    const theta = Math.acos(2 * Math.random() - 1);
+                    const phi = 2 * Math.PI * Math.random();
+
+                    x = r * Math.sin(theta) * Math.cos(phi);
+                    y = r * Math.sin(theta) * Math.sin(phi);
+                    z = r * Math.cos(theta);
+                } else if (sub.type === 'p') {
+                    // Dumbbell-shaped orbital distribution (2p / 3p)
+                    const axis = i % 3; // px, py, pz
+                    const u = Math.random();
+                    const r = (-Math.log(1 - u) * sub.scale * 0.45) + 1.2;
+                    const theta = (Math.random() - 0.5) * Math.PI * 0.6; // directional lobing
+                    const phi = (Math.random() - 0.5) * Math.PI * 0.6;
+
+                    if (axis === 0) { // Px
+                        x = (Math.random() > 0.5 ? 1 : -1) * r * Math.cos(theta);
+                        y = r * Math.sin(theta);
+                        z = r * Math.sin(phi);
+                    } else if (axis === 1) { // Py
+                        y = (Math.random() > 0.5 ? 1 : -1) * r * Math.cos(theta);
+                        x = r * Math.sin(theta);
+                        z = r * Math.sin(phi);
+                    } else { // Pz
+                        z = (Math.random() > 0.5 ? 1 : -1) * r * Math.cos(theta);
+                        x = r * Math.sin(theta);
+                        y = r * Math.sin(phi);
+                    }
+                }
+
+                // Wavefunction jitter / quantum fluctuation
+                positions[i * 3] = x + (Math.random() - 0.5) * 0.15;
+                positions[i * 3 + 1] = y + (Math.random() - 0.5) * 0.15;
+                positions[i * 3 + 2] = z + (Math.random() - 0.5) * 0.15;
+
+                // Color mapping: High quantum energy shells glow brighter cyan/electric blue
+                const dist = Math.sqrt(x * x + y * y + z * z);
+                const intensity = Math.max(0.2, 1.0 - (dist / 12));
+                
+                colors[i * 3] = 0.05 + intensity * 0.2;  // R
+                colors[i * 3 + 1] = 0.6 + intensity * 0.4; // G
+                colors[i * 3 + 2] = 0.95;                  // B
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const particleTexture = createParticleTexture();
+
+            const material = new THREE.PointsMaterial({
+                size: 0.28,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.65,
+                blending: THREE.AdditiveBlending,
+                map: particleTexture,
+                depthWrite: false
+            });
+
+            electronCloudPoints = new THREE.Points(geometry, material);
+            scene.add(electronCloudPoints);
+
+            // Update orbital UI tag
+            const currentOrbital = subshells[currentSubIndex].n + subshells[currentSubIndex].type;
+            document.getElementById('orbital-name').innerText = currentOrbital;
+        }
+
+        function createParticleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grad.addColorStop(0, 'rgba(255,255,255,1)');
+            grad.addColorStop(0.3, 'rgba(56,189,248,0.8)');
+            grad.addColorStop(0.8, 'rgba(14,165,233,0.2)');
+            grad.addColorStop(1, 'rgba(3,7,18,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 32, 32);
+
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        // --- Build Nucleus ---
+        function updateNucleus() {
+            while (nucleusGroup.children.length > 0) {
+                const obj = nucleusGroup.children[0];
+                nucleusGroup.remove(obj);
+                if (obj.geometry) obj.geometry.dispose();
+            }
+
+            const total = protons + neutrons;
+            if (total === 0) return;
+
+            // Golden spiral / Sphere packing algorithm for multi-nucleon cluster
+            const phi = (1 + Math.sqrt(5)) / 2;
+            const radiusScale = 0.45 * Math.pow(total, 1 / 3);
+
+            let pCount = 0;
+            let nCount = 0;
+
+            for (let i = 0; i < total; i++) {
+                const isProton = (i % 2 === 0 && pCount < protons) || (nCount >= neutrons);
+                if (isProton) pCount++; else nCount++;
+
+                const mesh = new THREE.Mesh(
+                    isProton ? protonGeo : neutronGeo,
+                    isProton ? protonMat : neutronMat
+                );
+
+                const theta = 2 * Math.PI * i / phi;
+                const y = 1 - (i / (total - 1 || 1)) * 2;
+                const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
+
+                const r = (0.2 + 0.8 * Math.sqrt((i + 1) / total)) * radiusScale * 1.1;
+
+                mesh.position.set(
+                    Math.cos(theta) * radiusAtY * r,
+                    y * r,
+                    Math.sin(theta) * radiusAtY * r
+                );
+
+                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+                nucleusGroup.add(mesh);
+            }
+        }
+
+        // --- Physics Stability & Radiation Calculation ---
+        function checkStability() {
+            const radIcon = document.getElementById('rad-icon');
+            const alertBanner = document.getElementById('alert-banner');
+            const statusTag = document.getElementById('stability-status');
+            const modal = document.getElementById('instability-modal');
+
+            // Stability physical rules:
+            // 1. Particle max threshold (> 20)
+            // 2. Neutron to Proton ratio (N/Z ratio instability)
+            const ratio = protons > 0 ? neutrons / protons : 99;
+            const extremeRatio = (protons > 1 && (ratio < 0.5 || ratio > 2.2));
+            const overflow = protons >= MAX_LIMIT || neutrons >= MAX_LIMIT || electrons >= MAX_LIMIT;
+            const electronImbalance = Math.abs(protons - electrons) > 5;
+
+            isInstable = overflow || extremeRatio || electronImbalance;
+
+            if (isInstable) {
+                radIcon.className = "fa-solid fa-radiation text-3xl text-red-500 radiation-warning";
+                alertBanner.classList.remove('hidden');
+                statusTag.className = "text-red-400 font-bold animate-pulse";
+                statusTag.innerText = "INSTÁVEL";
+
+                cpsRate = Math.floor(Math.random() * 25000) + 15000;
+                triggerAlarmSound(true);
+
+                if (overflow) {
+                    document.getElementById('alert-reason').innerText = "Limite máximo de partículas atômicas atingido!";
+                    document.getElementById('modal-desc').innerText = "A quantidade de partículas atingiu o limite máximo de estabilidade simulado (20).";
+                    modal.classList.remove('hidden');
+                } else if (extremeRatio) {
+                    document.getElementById('alert-reason').innerText = "Razão Nêutron/Próton desbalanceada (Decaimento Radiativo)!";
+                } else {
+                    document.getElementById('alert-reason').innerText = "Ionização extrema / Desequilíbrio eletrônico crítico!";
+                }
+
+            } else {
+                radIcon.className = "fa-solid fa-radiation text-3xl text-azure-400 radiation-pulse";
+                alertBanner.classList.add('hidden');
+                statusTag.className = "text-emerald-400 font-bold";
+                statusTag.innerText = "ESTÁVEL";
+
+                cpsRate = Math.floor(Math.random() * 15) + (protons * 2);
+                triggerAlarmSound(false);
+                modal.classList.add('hidden');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('instability-modal').classList.add('hidden');
+        }
+
+        // --- Interaction Controls ---
+        function adjustParticle(type, delta) {
+            initAudio();
+            if (type === 'protons') {
+                protons = Math.max(1, Math.min(MAX_LIMIT, protons + delta));
+                document.getElementById('proton-count').innerText = protons;
+            } else if (type === 'neutrons') {
+                neutrons = Math.max(0, Math.min(MAX_LIMIT, neutrons + delta));
+                document.getElementById('neutron-count').innerText = neutrons;
+            } else if (type === 'electrons') {
+                electrons = Math.max(0, Math.min(MAX_LIMIT, electrons + delta));
+                document.getElementById('electron-count').innerText = electrons;
+            }
+
+            // Update UI Element Info
+            const elem = elementsDB.find(e => e.z === protons) || { name: "Superpesado", symbol: "Unu" };
+            document.getElementById('element-symbol').innerText = elem.symbol;
+            document.getElementById('element-name').innerText = `${elem.name}-${protons + neutrons}`;
+
+            updateNucleus();
+            generateSchrodingerCloud(electrons);
+            checkStability();
+        }
+
+        // Mouse Drag Nuclear Vibrations / Rotation
+        let isDragging = false;
+        window.addEventListener('mousedown', () => { isDragging = true; initAudio(); });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('touchstart', () => { initAudio(); });
+
+        // --- Scintillometer (Cintilômetro) Needle & Sound Animation Loop ---
+        let lastGeigerClick = 0;
+        function updateScintillometer(time) {
+            const displayCps = Math.floor(cpsRate + (Math.random() * cpsRate * 0.2));
+            document.getElementById('cps-value').innerText = displayCps.toLocaleString();
+            document.getElementById('cpm-value').innerText = (displayCps * 60).toLocaleString() + " CPM";
+
+            // Needle Angle (-90deg to +90deg)
+            const maxCps = 30000;
+            const targetAngle = -90 + Math.min(180, (displayCps / maxCps) * 180);
+            const needle = document.getElementById('gauge-needle');
+            needle.style.transform = `rotate(${targetAngle}deg)`;
+
+            // Audio Click Trigger based on CPS rate
+            const clickInterval = displayCps > 0 ? Math.max(20, 10000 / displayCps) : 99999;
+            if (time - lastGeigerClick > clickInterval) {
+                playGeigerClick();
+                lastGeigerClick = time;
+            }
+        }
+
+        // --- Initialization ---
+        updateNucleus();
+        generateSchrodingerCloud(electrons);
+        checkStability();
+
+        // --- Main Animation Loop ---
+        const clock = new THREE.Clock();
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotate Nucleus gently
+            nucleusGroup.rotation.y = elapsedTime * 0.3;
+            nucleusGroup.rotation.x = Math.sin(elapsedTime * 0.2) * 0.1;
+
+            // Instability Nuclear Jitter Effect
+            if (isInstable) {
+                nucleusGroup.position.x = (Math.random() - 0.5) * 0.15;
+                nucleusGroup.position.y = (Math.random() - 0.5) * 0.15;
+                nucleusGroup.position.z = (Math.random() - 0.5) * 0.15;
+            } else {
+                nucleusGroup.position.set(0, 0, 0);
+            }
+
+            // Quantum Cloud Wavefunction Dynamics (Pulsing & Rotation)
+            if (electronCloudPoints) {
+                electronCloudPoints.rotation.y = elapsedTime * 0.15;
+                electronCloudPoints.rotation.z = Math.sin(elapsedTime * 0.1) * 0.1;
+
+                // Quantum cloud breathing/uncertainty pulse
+                const sizes = electronCloudPoints.geometry.attributes.position.array;
+                const count = sizes.length / 3;
+                if (isInstable) {
+                    electronCloudPoints.material.size = 0.35 + Math.sin(elapsedTime * 15) * 0.1;
+                } else {
+                    electronCloudPoints.material.size = 0.28 + Math.sin(elapsedTime * 2) * 0.03;
+                }
+            }
+
+            updateScintillometer(time);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Window Resizing Responsiveness
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        window.onload = function() {
+            animate(0);
+        };
+    </script>
+</body>
+</html>

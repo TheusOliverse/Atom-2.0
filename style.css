@@ -20,6 +20,10 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.direitos{
+    padding: 10px;
+}
+
 body,
 html {
     width: 100%;
@@ -343,4 +347,61 @@ header {
     .canvas-hint {
         display: none;
     }
+
+    .btn-hextech{
+        font-size: 10px;
+        width: 100%;
+    }
+}
+
+#modal{
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 2px solid rgb(17, 14, 36);
+    backdrop-filter: blur(5px);
+    background: rgba(5, 0, 24, 0.409);
+    color: white;
+    position: fixed;
+    margin-top: 50vh;
+    max-width: 500px;
+}
+
+#dialog1{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.m{
+    transition: 0.3s;
+    border-radius: 4px;
+    border: none;
+    padding: 5px;
+    background: white;
+    color: rgb(0, 4, 88);
+    font-size: 25px;
+}
+
+.m:hover{
+    transition: 0.3s;
+    background: bisque;
+    color: black;
+}
+
+.div_tit_modal{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icone_modal{
+    font-size: 30px;
+}
+.tit_modal{
+    font-size: 25px;
 }
