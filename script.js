@@ -507,3 +507,5 @@ function fechar_modal() {
 }
 
 fechar_modal()
+
+closeWelcome()
